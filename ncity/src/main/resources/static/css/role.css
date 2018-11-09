@@ -1,0 +1,6 @@
+html,body{
+	height: 100%;
+}
+
+.role_search{ padding:10px 10px; }
+.layui-table,.layui-table th{ text-align:center; }

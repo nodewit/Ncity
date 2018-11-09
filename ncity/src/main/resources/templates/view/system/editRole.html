@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../js/layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/user.css" media="all" />
+</head>
+<body class="childrenBody">
+	<form class="layui-form changePwd">
+		<input type="hidden" name="roleId"  id="roleId" th:value="${roleId}">
+		<div class="layui-form-item">
+		    <label class="layui-form-label">角色名称</label>
+		    <div class="layui-input-block">
+		    	<input type="text" name="roleName" value="" placeholder="角色名称" id="roleName"  lay-verify="required|roleName" class="layui-input pwd">
+		    </div>
+		</div>
+		<div class="layui-form-item">
+		    <label class="layui-form-label">角色描述</label>
+		    <div class="layui-input-block">
+		    	<input type="text" name="description" value="" placeholder="角色描述"  id="desc" class="layui-input pwd">
+		    </div>
+		</div>
+		<div class="layui-form-item">
+		    <div class="layui-input-block">
+		    	<button class="layui-btn" lay-submit="" lay-filter="*">保存</button>
+				<button type="button" class="layui-btn layui-btn-primary" onclick="parent.close();">关闭</button>
+		    </div>
+		</div>
+	</form>
+	<script type="text/javascript" src="../../js/layui/layui.js"></script>
+	<script type="text/javascript" src="../../js/jquery2.1.4.js"></script>
+	<script>
+	layui.use(['form','layer' ], function() {
+		var form = layui.form;
+		var layer = layui.layer;
+		// 添加验证规则
+		form.verify({
+			roleName : function(value, item) {
+				value = value.trim();
+				if (value.length < 0) {
+					return "请输入角色名称";
+				}
+			}
+		});
+
+		form.on('submit(*)', function(data) {
+			var index = layer.msg('提交中，请稍候',{icon: 16,time:false,shade:0.8});
+			var d = data.field;
+			var url = "/view/system/addRole";
+			if(d.roleId != ""){
+				url = "/view/system/updateRole";
+			}
+			$.ajax({ 
+				url: url,
+				data:d,
+				dataType:"text",
+				success: function(data){
+					layer.close(index);
+			    	if(data == 0){
+			            layer.msg("保存成功！");
+			            parent.queryRole();
+			            parent.close();
+			    	}else{
+			    		layer.msg("保存失败！");
+			    	}
+				},error:function(){
+					layer.close(index);
+					layer.msg("保存失败！");
+				}
+			});
+			return false;
+		});
+	});
+	
+	$(function(){
+		var id = $("#roleId").val();
+		if(id != ""){
+			$.ajax({ 
+				url: "/view/system/queryRoleById",
+				data:{"rid":id},
+				dataType:"json",
+				success: function(data){
+					$("#roleName").val(data.role_name);
+					$("#desc").val(data.description);
+				},error:function(){
+				}
+			});
+		}
+	})
+	
+	</script>
+</body>
+</html>

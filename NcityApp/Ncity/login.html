@@ -1,0 +1,298 @@
+<!documenttype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>documentument</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link rel="stylesheet" type="text/css" href="css/mui.css" />
+        <style>
+            @media only screen and (min-width: 100px) and (max-width: 300px) {
+                .mui-content .logo {
+                    width: 70%;
+                    height: 15%;
+                    margin: 12% auto 10% auto;
+                }
+            }
+            
+            .area {
+                margin: 20px auto 0px auto;
+            }
+            
+            .mui-input-group {
+                margin-top: 10px;
+                background-color: rgba(0, 0, 0, 0);
+            }
+            
+            .mui-content-padded {
+                margin-top: 25px;
+            }
+            
+            .mui-btn {
+                padding: 10px;
+            }
+            
+            .link-area {
+                display: block;
+                margin-top: 18px;
+                text-align: right;
+            }
+            
+            .oauth-area {
+                /*position: absolute;
+        bottom: 30px;*/
+                left: 0px;
+                text-align: center;
+                width: 100%;
+                padding: 0px;
+                margin: 0px;
+            }
+            
+            .oauth-area .oauth-btn {
+                display: inline-block;
+                width: 50px;
+                height: 50px;
+                background-size: 30px 30px;
+                background-position: center center;
+                background-repeat: no-repeat;
+                margin: 0px 20px;
+                /*-webkit-filter: grayscale(100%); */
+                border: solid 1px #ddd;
+                border-radius: 25px;
+            }
+            
+            .oauth-area .oauth-btn:active {
+                border: solid 1px #aaa;
+            }
+            
+            .oauth-area .oauth-btn.disabled {
+                background-color: #ddd;
+            }
+            
+            .logo {
+                width: 82%;
+                height: 25%;
+                max-width: 350px;
+                margin: 15% auto 10% auto;
+                overflow: hidden;
+            }
+            
+            .logo img {
+                width: 100%;
+                margin: 0;
+                border: none;
+                padding: 0;
+            }
+            
+            .mui-input-group:before,
+            .mui-input-group:after {
+                content: none;
+            }
+            
+            .mui-card {
+                box-shadow: none;
+            }
+            
+            .mui-input-group .mui-input-row:nth-last-child(1) {
+                text-align: center;
+                line-height: 40px;
+            }
+            
+            .mui-input-group .mui-input-row:nth-last-child(1):after {
+                content: none;
+            }
+            
+            .mui-input-row .mui-btn {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                float: none;
+                width: 90%;
+                height: 30px;
+                padding: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="mui-content">
+            <div id="help" class="help" style="position: absolute;right: 10px;top: 10px;color: #bbb;">
+                <a>帮助</a>
+            </div>
+            <div class="logo">
+                <img src="img/card1-1.png" />
+            </div>
+            <form id='login-form' class="mui-input-group mui-card">
+                <div class="mui-input-row">
+                    <input id="mobile" name='mobile' type="text" class="mui-input-clear mui-input" placeholder="请输入手机号">
+                </div>
+                <div class="mui-input-row" style="width: 80%;display: inline-block;">
+                    <input id="code" name='code' type="text" class="mui-input-clear mui-input" placeholder="请获取验证码">
+                </div>
+                <div class="mui-input-row" style="width: 18%;display: inline-block;">
+                    <button id="getcode" type="button" class="mui-btn mui-btn-primary mui-btn-outlined">验证码</button>
+                </div>
+            </form>
+
+            <div class="mui-content-padded">
+                <button id='login' class="mui-btn mui-btn-block mui-btn-primary">登录</button>
+                <div class="link-area">
+                    <a id='reg'>注册账号</a>
+                </div>
+            </div>
+            <div class="mui-content-padded oauth-area">
+                <div id="oauth" class="oauth-btn" style="background-image:url(img/weixin.png) ;"></div>
+            </div>
+        </div>
+        <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+        <script type="text/javascript" src="js/util.js"></script>
+        <script type="text/javascript">
+            mui.init();
+            
+            var mobileObj = document.getElementById("mobile"); //获取手机号输入框
+            var codeObj = document.getElementById("code"); //获取验证码输入框
+
+            //授权登录（微信登录）
+            document.getElementById("oauth").addEventListener("tap", function() {
+                var waiting = plus.nativeUI.showWaiting(); //设置等待动画
+
+                var auths = {};
+                //获取授权的服务
+                plus.oauth.getServices(function(services) {
+                    //获取授权服务
+                    for(var i in services) {
+                        var service = services[i];
+                        auths[service.id] = service;
+                    }
+                    var auth = auths["weixin"]; //获取微信授权对象
+                    
+                    auth.login(function(e) {
+                        //通过微信用户openid来实现登录
+                        var userOpenid = auth.userInfo.openid;
+
+                        getDataByAjax({
+                            type: 'POST',
+                            url: 'wxLogin',
+                            data: userOpenid,
+                            contentType: 'application/json;', //指定'application/json;'，后台SpringMVC（使用了@RequestBody）才能接收 预期的字符串（openid）
+                        }, function(result) {
+                            waiting.close();//关闭等待动画
+
+                            if(result.code == -4) {//微信号未注册，跳转至注册页面
+                                openPage("register.html", {
+                                    openid: userOpenid
+                                }); 
+                                return;
+                            }
+                            console.info(JSON.stringify(result));
+                            plus.nativeUI.toast("登录成功");
+                            //登录成功
+                            localStorage.setItem("loginInfo", result.data.uuid); //将信息保存至本地数据库
+                            localStorage.setItem("userName", result.data.name); //将信息保存至本地数据库
+                            openPage("main.html");
+                        });
+
+                    }, function(e) {//登录失败回调
+                        plus.nativeUI.toast("微信登录失败:" + JSON.stringify(e));
+                    });
+                }, function(e) {//获取服务列表失败回调
+                    plus.nativeUI.toast("获取分享服务列表失败：" + JSON.stringify(e));
+                });
+            });
+            
+            //使用手机号登录
+            document.getElementById("login").addEventListener("tap", function() {
+                getDataByAjax({
+                    type: 'GET',
+                    data: {"mobile":mobileObj.value,"code":codeObj.value},
+                    url: 'login',
+                }, function(result) {
+                    if(result.code == 0) { //code为0则成功
+                        plus.nativeUI.toast("登录成功");
+                        //登录成功
+                        localStorage.setItem("loginInfo", result.data.uuid); //将信息保存至本地数据库
+                        localStorage.setItem("userName", result.data.name); //将信息保存至本地数据库
+                        openPage("main.html");
+                    } else {
+                        plus.nativeUI.toast("登录失败")
+                    }
+                });
+            });
+
+            var codeBtn = document.getElementById("getcode");
+            //获取验证码
+            codeBtn.addEventListener("tap", function() {
+                if(!/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(mobileObj.value)) {
+                    plus.nativeUI.toast("手机号输入错误，请输入正确的手机号。");
+                    return;
+                }
+                codeObj.placeholder = "请输入验证码";
+                countDown(codeBtn);//执行倒计时方法
+                codeBtn.setAttribute("disabled","disabled");
+                
+                getDataByAjax({
+                    type: "POST",
+                    url: 'send',
+                    data: mobileObj.value,
+                    contentType: 'application/json;',
+                }, function(result) {
+                    plus.nativeUI.toast("获取验证码成功")
+                });
+            });
+
+            //跳转至注册页面
+            document.getElementById("reg").addEventListener("tap", function() {
+                openPage("register.html");
+            });
+            //帮助页面
+            document.getElementById("help").addEventListener("tap", function() {
+                console.info("进入帮助")
+                plus.nativeUI.toast("进入帮助");
+            });
+            
+            mui.plusReady(function() {
+                // 关闭程序启动界面，不设置将会在6秒后关闭
+                setTimeout(function() {
+                    //关闭 splash
+                    plus.navigator.closeSplashscreen();
+                }, 800);
+
+                //如果本地仓库数据不为空，则自动登录
+                if(localStorage.loginInfo) {
+//                  console.info("自动登录成功")
+                    plus.nativeUI.toast("自动登录成功");
+                    //跳转至主页
+                    openPage("main.html");
+                }
+            });
+
+            //查看localStorage中所有值
+            //             var localArr = {};
+            //             for(var i = 0;i<localStorage.length;i++){
+            //                 var key = localStorage.key(i);
+            //                 var value = localStorage.getItem(key);
+            //                 localArr[key] = value;
+            //             }
+            //             plus.nativeUI.toast(JSON.stringify(localArr));
+            //             localStorage.clear() //清除所有数据
+            
+            
+            //  console.info("高度："+document.body.clientHeight);
+            //  document.addEventListener("resize",function(){
+            //      console.info("高度2："+window.innerHeight);
+            //  })
+
+
+
+//              setTimeout(function() {//一定时间后关闭等待动画
+//                  console.info(JSON.stringify(waiting))
+//                  if(waiting){
+//                      plus.nativeUI.toast("服务器繁忙，请稍后重试。。。")
+//                      waiting.close();
+//                  }
+//              }, 6000);
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../js/layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/user.css" media="all" />
+</head>
+<body class="childrenBody">
+	<form class="layui-form">
+		<input type="hidden" name="userId"  id="userId" th:value="${userId}">
+		<div class="user_left">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">登录名 </label>
+			    <div class="layui-input-block">
+			    	<input type="text" name="loginId"  id="loginId" placeholder="请输入登录名" value="" lay-verify="required|loginId" class="layui-input">
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">真实姓名</label>
+			    <div class="layui-input-block">
+			    	<input type="text" value="" name="name" id="name" placeholder="请输入真实姓名" lay-verify="required" class="layui-input realName">
+			    </div>
+			</div>
+			<div class="layui-form-item" pane="">
+			    <label class="layui-form-label">性别</label>
+			    <div class="layui-input-block userSex">
+	     			<input type="radio" name="sex" value="0" title="女">
+			    	<input type="radio" name="sex" value="1" title="男" checked="">
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">手机号码</label>
+			    <div class="layui-input-block">
+			    	<input type="tel" value="" name="mobile" id="mobile" placeholder="请输入手机号码" class="layui-input userPhone">
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">邮箱</label>
+			    <div class="layui-input-block">
+			    	<input type="text" value="" name="email" id="email" placeholder="请输入邮箱" class="layui-input userEmail">
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">选择角色</label>
+			    <div class="layui-input-block" id="roles">
+			    </div>
+			</div>
+			<div class="layui-form-item" id="tip">
+			    <div class="layui-input-block">
+			    	<span style="color:red">注：新用户的密码统一为：123456</span>
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <div class="layui-input-block">
+			    	<button class="layui-btn" lay-submit="" lay-filter="*">保存</button>
+					<button type="button" class="layui-btn layui-btn-primary" onclick="parent.close();">关闭</button>
+			    </div>
+			 </div>
+		</div>
+	</form>
+	<script type="text/javascript" src="../../js/layui/layui.js"></script>
+	<script type="text/javascript" src="../../js/jquery2.1.4.js"></script>
+	<script>
+
+	layui.use(['form','layer' ], function() {
+		var form = layui.form;
+		var layer = layui.layer;
+		// 添加验证规则
+		form.verify({
+			loginId : function(value, item) {
+				value = value.trim();
+				var flag = true;
+				$.ajax({
+					url : "/view/system/isLoginId",
+					data:{
+						"loginId":value
+					},
+					async:false,
+					success : function(data) {
+						flag = data;
+					},
+					error : function() {
+						return "错误";
+					}
+				});
+				if(!flag){
+					return "登录名已存在，请换一个登录名。";
+				}
+			}
+		});
+
+		form.on('submit(*)', function(data) {
+			var index = layer.msg('提交中，请稍候',{icon: 16,time:false,shade:0.8});
+			var d = data.field;
+			var checkbox = $(".layui-form-checked").prev();
+			var roleIds = "";
+			for(var i=0;i<checkbox.length;i++){
+				var roleId = $(checkbox[i]).val();
+				roleIds += roleId;
+				if(i<checkbox.length-1){
+					roleIds += ",";
+				}
+			}
+			d["roleIds"] = roleIds;
+			var url = "/view/system/addUser";
+			if(d.userId != ""){
+				url = "/view/system/updateUserInfo";
+			}
+			$.ajax({ 
+				url: url,
+				data:d,
+				dataType:"text",
+				success: function(data){
+					layer.close(index);
+			    	if(data == 0){
+			            layer.msg("保存成功！");
+			            parent.queryUser();
+			            parent.close();
+			    	}else{
+			    		layer.msg("保存失败！");
+			    	}
+				},error:function(){
+					layer.close(index);
+					layer.msg("保存失败！");
+				}
+			});
+			return false;
+		});
+	});
+	var count = 0;
+	$(function(){
+		$.ajax({
+			url : "/view/system/queryRoleList",
+			dataType : "json",
+			async:false,
+			success : function(data) {
+				var html = "";
+				for(var i=0;i<data.length;i++){
+					html += '<input type="checkbox" value="'+data[i].id+'" name="roleId'+data[i].id+'" title="'+data[i].role_name+'">';
+					count++;
+				}
+				$("#roles").html(html);
+			},
+			error : function() {
+			}
+		});
+		
+		var id = $("#userId").val();
+		if(id != ""){
+			$.ajax({ 
+				url: "/view/system/queryUserById",
+				data:{"uid":id},
+				async:false,
+				dataType:"json",
+				success: function(data){
+					$("#tip").css("display","none");
+					$("#loginId").attr("disabled","disabled");
+					$("#loginId").removeAttr("lay-verify");
+					$("#loginId").val(data.login_id);
+					$("#name").val(data.name);
+					$("#mobile").val(data.mobile);
+					$("#email").val(data.email);
+					$("input:radio[name=sex]").eq(data.sex).attr("checked",'checked');
+					for(var i=0;i<data.roles.length;i++){
+						var id = data.roles[i].role_id;
+						console.log(id);
+						$("input:checkbox[name=roleId"+id+"]").attr("checked",'checked');
+					}
+				},error:function(){
+				}
+			});
+		}
+	})
+	
+	</script>
+</body>
+</html>

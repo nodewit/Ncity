@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Document</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link rel="stylesheet" type="text/css" href="css/mui.css" />
+        <link rel="stylesheet" href="css/iconfont.css" />
+        <style>
+            html,
+            body {
+                height: 100%
+            }
+            
+            .mui-content {
+                padding: 5px 3% 0 3%;
+                width: 100%;
+                height: 70%;
+                font-size: 14px;
+                position: relative;
+            }
+            
+            .index-notice {
+                height: 30px;
+                line-height: 30px;
+                background: #ccc;
+                text-align: center;
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+            
+            .index-notice span {
+                float: left;
+                height: 30px;
+            }
+            
+            .mui-icon {
+                line-height: initial;
+                /*取消icon行高，否则不能垂直居中*/
+            }
+            
+            .userinfo {
+                float: left;
+                width: 220px;
+                height: 50px;
+            }
+            
+            .userinfo>div {
+                float: left;
+                line-height: 25px;
+                vertical-align: middle;
+                font-size: 14px;
+            }
+            
+            .userinfo>div .iconfont {
+                display: inline-block;
+                width: 20px;
+                font-size: 18px;
+                margin-right: 5px;
+            }
+            
+            .userinfo .userinfo-portrait {
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+                background: url(img/logo.png) no-repeat center/100% 100%;
+                margin-right: 10px;
+            }
+            
+            .activity {
+                float: right;
+                text-align: center;
+                width: 50px;
+            }
+            
+            .activity div {
+                height: 70px;
+                font-size: 12px;
+            }
+            
+            .activity div .mui-icon {
+                line-height: 40px;
+                font-size: 32px;
+                width: 100%;
+            }
+            
+            .diamond-content {
+                position: absolute;
+                top: 95px;
+                bottom: 5px;
+                left: 3%;
+                right: 50px;
+            }
+            
+            .diamond {
+                position: absolute;
+            }
+            
+            .diamond div{
+                text-align: center;
+                position: relative;
+            }
+            
+            .diamond div * {
+                display: block;
+                margin-top: 5px;
+            }
+            
+            .mui-scroll-wrapper {
+                top: inherit;
+                float: left;
+                max-height: 170px;
+                height: 30%;
+                bottom: 0;
+                background: #cecece;
+            }
+            
+            .mui-scroll {
+                height: 100%;
+                line-height: 100%;
+                white-space: nowrap;
+                /*禁止自动换行*/
+                width: auto;
+                padding: 0 10px 0 10px;
+                background: #cecece;
+            }
+            
+            .mui-scroll .tool-item {
+                height: 100%;
+                line-height: 100%;
+                width: 130px;
+                display: inline-block;
+                white-space: normal;
+                text-align: center;
+                background: #999;
+                border-radius: 20px;
+            }
+            
+            .tool-item .tool-img {
+                line-height: 100px;
+                height: 70%;
+            }
+            
+            .tool-item .tool-img img {
+                vertical-align: middle;
+                width: 80%;
+				height: 75px;
+				/* object-fit: cover; */
+            }
+            
+            .tool-item .tool-title {
+                line-height: 2;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="mui-content">
+
+            <div class="index-notice">
+                <span class="mui-icon mui-icon-email" style="width: 15%;"></span>
+                <span id="notice" style="width: 70%;overflow: hidden;">
+                 <marquee scrollamount="3">这儿显示最新的通知：最新的通知、新的通知、的通知、通知</marquee>
+            </span>
+                <span style="width: 14%;"><a id="noticeMore">更多</a></span>
+            </div>
+            <div class="userinfo">
+                <div class="userinfo-portrait" data-href="setting.html">
+                </div>
+                <div class="userinfo-right">
+                    <div id="integral" data-href="integral.html"><label><span class="iconfont icon-qi"></span>灵力：</label><span>0</span></div>
+                    <div id="diamond" data-href="diamond.html"><label><span class="iconfont icon-zuanshi"></span>灵钻：</label><span>0.00000</span></div>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div id="signIn" style="pointer-events: none;color: #aaa;">
+                    <span class="mui-icon mui-icon-map"></span> <span>已签到</span>
+                </div>
+            </div>
+
+            <div class="diamond-content">
+                <!-- 显示钻石 -->
+                <div class="diamond" style="left:47%;top: 30%;">
+                    <div><i class="iconfont icon-zuanshi"></i><span>正在生成</span></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <div class="tool-item" data-href="time_machine.html">
+                    <div class="tool-img">
+                        <img src="img/muwu.jpg" />
+                    </div>
+                    <div class="tool-title">
+                        时光机
+                    </div>
+                </div>
+                <div class="tool-item" data-href="promise.html">
+                    <div class="tool-img">
+                        <img src="img/yuantiao.jpg" />
+                    </div>
+                    <div class="tool-title">
+                        一诺千金
+                    </div>
+                </div>
+                <div class="tool-item" data-href="credential.html">
+                    <div class="tool-img">
+                        <img src="img/cbd.jpg" />
+                    </div>
+                    <div class="tool-title">
+                        证书
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+        <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="js/util.js"></script>
+        <script type="text/javascript">
+            mui.init();
+
+            //初始化滚动容器
+            mui('.mui-scroll-wrapper').scroll({
+                scrollX: true, //是否横向滚动
+                scrollY: false,
+                indicators: false, //是否显示滚动条
+                deceleration: 0.007, //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+            });
+			
+			/*分开监听，防止某个功能需求变更*/
+            //点击打开通知列表（更多通知）
+            $("#noticeMore").on('click', function() {
+                openPage("notice.html")
+            });
+            //为下方导航栏添加事件监听
+            $(".mui-scroll").on("tap", ".tool-item", function() {
+                var dataHref = this.getAttribute("data-href");
+                openPage(dataHref);
+            });
+            //为灵钻、灵力总数显示添加点击事件（跳转至记录页面）
+            $(".userinfo-right").on("tap", "div", function() {
+                var dataHref = this.getAttribute("data-href");
+                openPage(dataHref);
+            });
+            //为头像添加点击事件（用户信息与设置页面）
+            $(".userinfo-portrait").on("tap", function() {
+                var dataHref = this.getAttribute("data-href");
+                openPage(dataHref);
+            });
+            //为签到添加点击事件
+            $("#signIn").on("tap", function() {
+                var oldNum = Number($('#integral > span').html());
+
+                //签到
+                getDataByAjax({
+                    type: 'GET',
+                    url: 'user/signIn?uuid=' + localStorage.getItem("loginInfo"),
+                }, function(result) {
+                    $("#signIn").css({
+                        "pointer-events": "none",
+                        "color": "#aaa"
+                    });
+                    $("#signIn span:last-child").html("已签到");
+                    $('#integral > span').html(oldNum + 1);
+                    plus.nativeUI.toast("签到成功");
+                });
+            });
+
+            //点击获取钻石（同时删除页面上该节点）
+            $(".diamond-content").on('click', '.diamond.act', function() {
+                //播放点击音效
+                var click = plus.audio.createPlayer("img/click.mp3");
+                click.play(function() {
+                    click.stop();
+                }, function(e) {
+                    plus.nativeUI.toast('播放音频文件(点击音效)失败：' + e.message)
+                })
+                
+                var oldNum = Number($('#diamond > span').html());
+                var val = Number(this.getElementsByTagName("span")[0].innerHTML); //获取值
+                var id = this.id;
+                id = id.substring(id.indexOf("-") + 1, id.length); //获取id
+
+                //获取灵钻
+                getDataByAjax({
+                    type: 'GET',
+                    url: 'blockchain/updateDiamondLog',
+                    data: {
+                        uuid: localStorage.getItem("loginInfo"),
+                        diamondLogId: id
+                    },
+                }, function(result) {
+                    if($('.diamond').length == 0) {
+                        createDiamond(); //点击完所有灵钻，再次查询是否还有剩余灵钻
+                    }
+                });
+                //淡出，并删除节点
+                $(this).fadeOut(200, function() {
+                    $('#diamond > span').html((oldNum + val).toFixed(5));
+                    $(this).remove(); //删除点击的元素
+                });
+            });
+
+            //生成灵钻
+            var createDiamond = function() {
+                //console.info(localStorage.getItem("loginInfo"));
+                getDataByAjax({
+                    type: 'GET',
+                    url: 'blockchain/queryDiamondLogByPage',
+                    data: {
+                        uuid: localStorage.getItem("loginInfo"),
+                        receive: 0,
+                        pageSize: 10,
+                        pageNumber: 1
+                    },
+                }, function(result) {
+                    //                  console.info(JSON.stringify(result))
+                    var len = result.data.length;
+                    if(!len) {
+                        $(".diamond-content").html(
+                            '<div class="diamond" style="left:47%;top: 30%;">' +
+                            '<div><i class="iconfont icon-zuanshi"></i><span>正在生成</span></div>' +
+                            '</div>');
+
+                        return;
+                    }
+
+                    var num = 16; //不重叠的数值（百分比）
+                    var str = '';
+                    //设置x、y初值（初值不显示）
+                    var xArr = [];
+                    var yArr = [];
+                    xArr.push((Math.random() * (90 + 1)));
+                    yArr.push((Math.random() * (85 + 1)));
+                    for(var i = 0; i < len;) {
+                        //随机数（公式：Math.floor(Math.random()*(max-min+1)+min);）
+                        var x = (Math.random() * (90 + 1));
+                        var y = (Math.random() * (85 + 1));
+                        var isPass = true;
+                        //判断数组中的每个数（防止两个点重叠），生成下一个节点
+                        for(var j = 0; j < xArr.length; j++) {
+                            if(x < xArr[j] + num && x > xArr[j] - num && y < yArr[j] + num && y > yArr[j] - num) {
+                                isPass = false;
+                                break;
+                            }
+                        }
+                        if(isPass) {
+                            str += '<div id="diamond-' + result.data[i].id + '" class="diamond act" style="left: ' + xArr[i] + '%;top: ' + yArr[i] + '%;"><div><i class="iconfont icon-zuanshi"></i><span>' + result.data[i].diamond + '</span></div></div>';
+                            xArr.push(x);
+                            yArr.push(y);
+                            i++;
+                        }
+                    }
+                    $(".diamond-content").html(str);
+					
+					
+					//调用钻石动画
+					setTimeout(function(){//加上定时器,避免过快导致无法执行动画
+						diamondAni();
+					},200)
+                });
+            };
+			
+			//第三种：钻石动画(这个效果算是较好的了)
+			function diamondAni(){
+				
+				$(".diamond-content .diamond div").each(function(){
+					$(this).css({transform:"translateY(1"+(Math.random()*10)+"px)",transition:"1s",opacity:"0."+(Math.floor(Math.random()*(6-4+1)+4))});
+				});
+				
+				setTimeout(function(){
+					$(".diamond-content .diamond div").each(function(){
+						$(this).css({transform:"translateY("+(Math.random()*10)+"px)",transition:"0.8s",opacity:1});
+					});
+					//$(".diamond-content .diamond div").css({transform:"translateY(0px)",transition:"1s"});
+					
+					setTimeout(function(){
+						diamondAni();
+					},900)
+				},1100);
+				
+			}
+			
+            mui.plusReady(function() {
+				
+				// localStorage.setItem("loginInfo","e938c33e42fc410a8c3d2a98f6a5080b")
+                //获取顶部最新通知
+                var getNewNotice = function() {
+                    getDataByAjax({
+                        type: 'post',
+                        url: 'queryListTitle',
+                    }, function(result) {
+                        $('marquee').html(result.data.title);
+                    });
+                }();
+
+                //显示灵钻
+                var getDiamond = function() {
+                    getDataByAjax({
+                        type: 'POST',
+                        url: 'blockchain/diamond?uuid=' + localStorage.getItem("loginInfo"),
+                    }, function(result) {
+                        $('#diamond > span').html(result.data.toFixed(5));
+                    });
+                }();
+                //显示灵力（查询用户信息）
+                var getIntegral = function() {
+                    getDataByAjax({
+                        type: 'POST',
+                        url: 'queryUserEntityByUuid?uuid=' + localStorage.getItem("loginInfo"),
+                    }, function(result) {
+                        $('#integral > span').html(result.data.integral);
+                    });
+                }();
+
+                //判断是否已签到
+                function isSingIn() {
+                    //获取灵钻
+                    getDataByAjax({
+                        type: 'GET',
+                        url: 'user/isSignIn?uuid=' + localStorage.getItem("loginInfo"),
+                    }, function(result) {
+                        if(!result.data) {
+                            $("#signIn").css({
+                                "pointer-events": "",
+                                "color": "#000" //#007aff
+                            });
+                            $("#signIn span:last-child").html("签到");
+                        }
+                    });
+                }
+                isSingIn();
+
+                createDiamond(); //打开页面执行生成钻石方法
+            });
+        </script>
+    </body>
+
+</html>

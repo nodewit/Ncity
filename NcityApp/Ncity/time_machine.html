@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Hello MUI</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="css/mui.css">
+    </head>
+
+    <body>
+        <header class="mui-bar mui-bar-nav">
+        	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        	<button id="add" class="mui-btn  mui-btn-link mui-btn-nav mui-pull-right">
+        							新增
+        	</button>
+        	<h1 class="mui-title">时光机</h1>
+        </header>
+        
+        <script src="js/mui.js"></script>
+        <script>
+            //该页面打开时不显示，等子页面（notice_sub加载完成之后显示）
+            mui.init({
+                subpages:[{//初始化子页面
+                    url:'time_machine_sub.html',
+                    id:'time_machine_sub.html',
+                    styles:{
+                        top: '45px',
+                        bottom: '0px',
+                    }
+                }]
+            });
+			
+			document.getElementById("add").addEventListener("tap", function() {
+				//event.preventDefault();//阻止浏览器默认行为
+				mui.openWindow({
+					url: 'time_machine_add.html',
+					id: 'time_machine_add.html'
+				});
+			});
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,86 @@
+html,body {
+	height: 100%;
+}
+
+.layui-form {
+	height: 100%;
+}
+
+.tree {
+	float: left;
+	width: 20%;
+	height: 100%;
+	border-right: 1px solid #DDDDDD;
+	overflow: auto;
+}
+
+.right {
+	padding: 20px; 
+	float : left;
+	width: 45%;
+	height: 90%;
+	overflow: auto;
+	float: left;
+}
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+	width: 5px;
+	height: 16px;
+	background-color: #F5F5F5;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+	background-color: #DDDDDD;
+}
+
+/*閫傞厤*/
+@media screen and (max-width:1050px) {
+	/*鐢ㄦ埛淇℃伅*/
+	.user_left,.user_right,.changePwd {
+		width: 100%;
+		float: none;
+		margin-left: 0;
+	}
+	.user_right {
+		margin-bottom: 20px;
+	}
+}
+
+@media screen and (max-width:450px) {
+	.tree {
+		width: 100%;
+	}
+	.right {
+		width: 95%;
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+}
+
+form input.layui-input[disabled] {
+	background: #f2f2f2;
+	color: #595963 !important;
+}
+
+.layui-btn+.layui-btn{
+	margin-left: 0px;
+}
+
+.icon{
+	float: left;
+	border: 1px solid #D2D2D2;
+	padding: 9px;
+	margin-right: 10px;
+}
+

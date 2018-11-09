@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="css/mui.css"/>
+    <style>
+        body{
+            text-align: center;
+        }
+        h1{
+            line-height: 100px;
+        }
+        
+        textarea{
+            margin-top: 50px;
+            height: 200px;
+        }
+        
+        .bottom {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .bottom button {
+            vertical-align: middle;
+            display: inline-block;
+            width: 80%;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>设置
+        </button>
+        <h1 class="mui-center mui-title">意见反馈</h1>
+    </div>
+    
+    <div class="mui-content">
+        <h1>诺诚</h1>
+        <textarea id="content" placeholder="请输入 20字 或 20字以上 的评论"></textarea>
+        
+        <div class="bottom">
+            <button id="submit" type="button" class="mui-btn mui-btn-primary">提交意见</button>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/jquery2.1.4.js" ></script>
+    <script type="text/javascript" src="js/util.js" ></script>
+    <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        mui.init();
+        var content = document.getElementById("content");
+        
+        document.getElementById("submit").addEventListener('tap',function(){
+            if(content.value.length < 21){
+                plus.nativeUI.toast("请输入 20字 或 20字以上 的评论。");
+                return;
+            }
+            
+            var waiting = plus.nativeUI.showWaiting();
+            getDataByAjax({
+                type: 'POST',
+                url: 'user/suggest',
+                data: JSON.stringify({"uuid":localStorage.getItem("loginInfo"),"content":content.value}),
+                contentType: 'application/json;', //指定'application/json;'，后台SpringMVC（使用了@RequestBody）才能接收 预期的字符串（openid）
+            }, function(result) {
+                plus.nativeUI.closeWaiting();//关闭等待动画
+                
+                plus.nativeUI.toast("提交成功，谢谢您的反馈。");
+                
+                plus.webview.currentWebview().close();
+                
+            }); 
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.css">
+		<link rel="stylesheet" href="css/previewImage.css" />
+		<link rel="stylesheet" href="css/audio.css" />
+		<style>
+			.mui-card-content .custom-card-imgage .custom-card-imgage-img {
+					display: inline-block;
+					width: 31%;
+					height: 100px;
+					margin: 3px;
+			}
+
+			.mui-card-content .custom-card-imgage .custom-card-imgage-img img {
+					height: 100%;
+					width: 100%;
+					object-fit: cover;
+					/*img方式实现不同大小图片居中显示*/
+					/*margin: 0 -100%*/
+					;
+					/*配合父容器text-align,可实现居中*/
+			}
+            
+            .yLike {
+                color: #88bbdd;
+            }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="pullrefresh" class="mui-scroll-wrapper mui-content">
+			<div class="mui-scroll">
+
+				<!-- <div class="mui-card">
+							<div class="mui-card-header mui-card-media">
+									<img src="img/logo.png" />
+									<div class="mui-media-body">
+											小M
+											<p><span>0000-00-00 00:00</span><span style="float: right;">私密</span></p>
+									</div>
+							</div>
+							<div class="mui-card-content">
+									<div class="mui-card-content-inner">
+											<p style="color: #333;">这儿显示的是静态数据、显示的是静态数据、的是静态数据、静态数据、数据</p>
+									</div>
+									<div class="custom-card-imgage">
+											<div class="custom-card-imgage-img">
+													<img src="img/card1-1.png" data-preview-src="" data-preview-group="1" />
+											</div>
+											<div class="custom-card-imgage-img">
+													<img src="img/cbd.jpg" data-preview-src="" data-preview-group="1" />
+											</div>
+											<div class="custom-card-imgage-img">
+													<img src="img/logo.png" data-preview-src="" data-preview-group="1" />
+											</div>
+									</div>
+							</div>
+					</div>
+				</div> -->
+
+			</div>
+
+			<div id="play" class="rp">
+				<div id="ptime" class="ptime">00:00:00/00:00:00</div><br />
+				<div id="progress" class="progress">
+					<div id="schedule" class="schedule"></div>
+				</div>
+				<br />
+				<div class="stop" onclick="stopPlay()"></div>
+			</div>
+
+
+		</div>
+
+		<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+		<script type="text/javascript" src="js/util.js"></script>
+		<script type="text/javascript" src="js/mui.js"></script>
+		<script type="text/javascript" src="js/mui.previewimage.js"></script>
+		<script type="text/javascript" src="js/mui.zoom.js"></script>
+		<script type="text/javascript" src="js/audio.js"></script>
+        <script type="text/javascript" src="js/isLike.js"></script>
+		<script>
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+						contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+						contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+						// auto: true,
+						callback: pulldownRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					},
+					up: {
+						height: 50, //可选.默认50.触发上拉加载拖动距离
+						auto: true, //可选,默认false.自动上拉加载一次
+						contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+						contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+						callback: pullupRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					}
+				}
+			});
+
+
+			var pageNumber = 0; //页数（第几页）(设置为0是为了首次进入时，实现上拉加载)
+			var pageSize = 10; //每页数量
+			var table = $('.mui-scroll');
+
+			// 初始化previewImage（图片预览）
+			mui.previewImage();
+
+			/*下拉刷新业务实现*/
+			function pulldownRefresh() {
+				getNotice(1, pageSize, function(str) { //刷新固定第一页、
+					mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //结束下拉刷新
+					mui('#pullrefresh').pullRefresh().refresh(true); //重置上拉加载
+					pageNumber = 1; //初始化页数为第1页
+					table.html(str);
+				});
+			}
+			/*上拉加载具体业务实现*/
+			function pullupRefresh() {
+				getNotice(++pageNumber, pageSize, function(str) {
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh(str == ""); //参数为true代表没有更多数据了。
+					table.append(str);
+				});
+			}
+
+			//获取信息
+			var getNotice = function(num, size, callback) {
+				// 				var async = true;
+				// 				if (num == 1) { //上拉为异步，下拉为同步（因为页数为1肯定为下拉刷新）
+				// 					async = false;
+				// 				}
+				getDataByAjax({
+					type: 'GET',
+					url: 'blockchain/queryListChainByPage?uuid=' + localStorage.getItem("loginInfo"),
+					data: {
+						"pageNumber": num,
+						"pageSize": size,
+						"type": 1 //类型为公开
+					},
+					// async: async, //同步（有时会出现上拉加载之后，无法下拉刷新，所以下拉刷新改为 同步 ）//（修改双webview下拉刷新后，目前不需要了）
+				}, function(result) {
+					// console.info(JSON.stringify(result));
+					var str = '';
+					$.each(result.data, function(k, v) {
+                        str += '<div class="mui-card">';
+						if (v.typeId == 2) { //如果为一诺千金
+							str += '<div class="mui-card-header mui-card-media">' +
+								'<img src="img/logo.png" />' +
+								'<div class="mui-media-body">' +
+								v.name +
+								'<p><span>' + getMyDate(v.createTime) + '</span><span style="float: right;"></span></p>' +
+								'</div>' +
+								'</div>' +
+								'<div class="mui-card-content" style="padding: 10px 15px 0 15px;">' +
+								'<button type="button" class="mui-btn mui-btn-danger mui-btn-block mui-btn-outlined play" data-href="' +
+								(
+									v
+									.data.files[0] ? v.data.files[0].filePath : "") + '" style="line-height: 10px;">语音播放器</button>' +
+								'</div>' ;
+						} else {
+							str += '<div class="mui-card-header mui-card-media">' +
+								'<img src="img/logo.png" />' +
+								'<div class="mui-media-body">' +
+								v.name +
+								'<p><span>' + getMyDate(v.createTime) + '</span><span style="float: right;"></span></p>' +
+								'</div>' +
+								'</div>' +
+								'<div class="mui-card-content">' +
+								'<div class="mui-card-content-inner">' +
+								'<p style="color: #333;">' + (v.data.description || "") + '</p>' +
+								'</div>' +
+								'<div class="custom-card-imgage">';
+							var imgLen = v.data.files.length;
+							var imgWidth = 31.5; //默认宽度（百分比）
+							var imgHeight = 100; //默认高度（px）
+							if (imgLen < 3) {
+								imgWidth = (96.5 / imgLen);
+								imgHeight = 100 + (100 / imgLen);
+							}
+							for (var i = 0; i < imgLen; i++) { //拼接多张图片
+								var imgPath = v.data.files[i].filePath;
+								str += '<div class="custom-card-imgage-img" style="width:' + imgWidth + '%;height:' + imgHeight + 'px">' +
+									'<img src="' + imgPath + '" data-preview-src="" data-preview-group="' +  pageNumber+k + '"/>' +
+									'</div>';
+							};
+							str += '</div>' +
+								'</div>';
+						}
+                        str += '<div class="mui-card-footer">' +
+                        	'<a class="mui-card-link">'+
+                        		'<span class="'+(v.isLike ? "yLike":"")+'" data-typeid="'+v.typeId+'">'+(v.isLike ? "已点赞":"点赞")+
+                        		'</span> （<span class="likeNum">'+v.likeNum+'</span>） 、 评论（'+v.commentNum+'）</a>' +
+                        	'<a class="mui-card-link"></a>' +
+                        	'<a class="mui-card-link" data-id="'+v.id+'" data-href="'+((v.typeId=="1") ? "time_machine_details.html" : "promise_details.html")+'">查看详情</a>' +
+                        '</div>' +
+                        '</div>';
+
+
+					});
+					//调用回调函数
+					callback(str);
+				});
+			};
+			
+
+			//语音播放按钮点击事件
+			$(".mui-scroll").on('click', '.play', function() {
+				var dataHref = this.getAttribute("data-href");
+				console.info("路径(" + plus.os.name + ")：" + dataHref)
+				if (!dataHref) {
+					plus.nativeUI.toast("服务器拼命加载中！！！");
+					return;
+				}
+				//判断是否为ios
+				downloadCheck(dataHref); //ios需先下载才能播放
+			});
+			
+			mui.plusReady(function() {
+				//监听页面隐藏事件
+				plus.webview.currentWebview().addEventListener('hide', function(e){
+					if (ep.style.display == "block") { //重置播放
+						stopPlay();
+					}
+				}, false);
+				
+			});
+		</script>
+	</body>
+
+</html>

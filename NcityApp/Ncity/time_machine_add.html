@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="css/mui.css" />
+    <link href="css/mui.picker.css" rel="stylesheet" />
+    <link href="css/mui.poppicker.css" rel="stylesheet" />
+    <style>
+        p {
+            margin-top: 25px;
+            font-size: 18px;
+            line-height: 20px;
+            padding-left: 15px;
+        }
+        
+        .image-list {
+            width: 100%;
+            /*height: 85px;*/
+            background-color: #fff;
+            padding: 10px 10px;
+            /*overflow: hidden;*/
+            /*隐藏（超出范围的）选择图片的按钮*/
+        }
+        
+        .image-item {
+            width: 65px;
+            height: 65px;
+            /*background-image: url(../images/iconfont-tianjia.png);*/
+            background-size: 100% 100%;
+            display: inline-block;
+            position: relative;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            /*border: solid 1px #e8e8e8;*/
+            vertical-align: top;
+        }
+        
+        .image-item .file {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 0;
+        }
+        
+        .image-item.space {
+            border: none;
+        }
+        
+        .image-item .image-close {
+            position: absolute;
+            display: inline-block;
+            right: -6px;
+            top: -6px;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 12px;
+            background-color: #FF5053;
+            color: #f3f3f3;
+            border: solid 1px #FF5053;
+            font-size: 9px;
+            font-weight: 200;
+            z-index: 1;
+        }
+        
+        .image-item .image-up {
+            height: 65px;
+            width: 65px;
+            border-radius: 10px;
+            line-height: 58px;
+            border: 1px solid #ccc;
+            color: #ccc;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .image-item .image-up:after {
+            font-family: "微软雅黑";
+            content: '+';
+            font-size: 60px;
+        }
+        
+        .image-item.space .image-close {
+            display: none;
+        }
+        
+        input,
+        textarea {
+            border: none !important;
+        }
+        
+        textarea {
+            height: 100px;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .bottom {
+            margin-top: 70px;
+            text-align: center;
+        }
+        
+        .bottom button {
+            vertical-align: middle;
+            display: inline-block;
+            width: 80%;
+            line-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>时光机
+        </button>
+        <h1 class="mui-center mui-title">记录记忆</h1>
+    </div>
+
+    <div class="mui-content feedback">
+        <p>珍贵记忆</p>
+        <div id='image-list' class="row image-list">
+            <div id="addImg" class="image-item">
+                <!--<div class="image-close" id="img-0">X</div>-->
+                <div class="image-up"></div>
+                <!--<div class="file" id="image-1"></div>-->
+            </div>
+        </div>
+
+        <p>描述</p>
+        <div>
+            <textarea id='description' class="mui-input-clear question" placeholder="留下一句话来帮助您回忆这段时光..."></textarea>
+        </div>
+
+        <p>类型</p>
+        <div>
+            <input id='opt-type' type="text" class="mui-input-clear contact" placeholder="(公开、私密)" readonly="" />
+        </div>
+        <div style="font-size: 12px;text-align: center;height: 40px;color: #aaa;">注：数据上链后将无法删除和修改，请谨慎填写。</div>
+
+        <div class="bottom">
+            <button id="submit" type="button" class="mui-btn mui-btn-primary">保存</button>
+        </div>
+    </div>
+
+    <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+    <script type="text/javascript" src="js/mui.picker.js"></script>
+    <script type="text/javascript" src="js/mui.poppicker.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript">
+        mui.init();
+        
+        var imageList = document.getElementById('image-list'); //获取放置图片容器
+        var description = document.getElementById('description'); //获取描述信息容器
+        var optType = document.getElementById('opt-type'); //获取选择类型容器
+        var index = 0;
+        
+        //初始化选择器
+        var picker = new mui.PopPicker();
+        picker.setData([{
+            value: '1',
+            text: '公开'
+        }, {
+            value: '0',
+            text: '私密'
+        }]);
+        optType.addEventListener('tap', function(event) {
+            picker.show(function(items) {
+                optType.value = items[0].text;
+                optType.dataVal = items[0].value;
+            })
+        });
+        
+        //删除点击的元素（父节点）
+        $('#image-list').on('click', '.image-close', function() {
+            $(this).parent().remove();
+        });
+
+        document.getElementById("addImg").addEventListener('tap', function() {
+            //调用相册、文件选择图片
+            plus.gallery.pick(function(event) {
+                var files = event.files; // 保存多选的图片或视频文件路径
+                for(var i in files) {
+                    var e = files[i];
+                    var name = e.substr(e.lastIndexOf('/') + 1);
+                    
+                    $("#image-list").prepend('<div class="image-item img" style="background-image:url(' + e + ')">' +
+                        '<div class="image-close" id="img-0">X</div>' +
+                        //'<div class="image-up"></div>'+
+                        '<div class="file" id="image-1"></div>' +
+                        '</div>');
+                }
+
+            }, function(e) {
+                mui.toast("已取消（" + e.message + "）");
+            }, {
+                multiple: true,
+                maximum: 9,
+                system: false
+            });
+        });
+		
+        
+
+        document.getElementById("submit").addEventListener('tap', function() {
+			
+            var imgLists = $('.image-item.img');
+            var files = [];
+            if(imgLists.length > 9) {
+                plus.nativeUI.toast("所选图片不应大于 9 张");
+                return;
+            }
+            if(!optType.dataVal) {
+                optType.placeholder = "点击此处选择类型";
+                plus.nativeUI.toast("请选择类型！！！")
+                return;
+            }
+			
+			if(imgLists.length<1 && description.value.length<10){
+				plus.nativeUI.toast("请至少留下一段话 或者 一张图片啊！！！")
+				return;
+			}
+			
+            $(imgLists).each(function() {
+                var imgUrl = decodeURI($(this).css('background-image'));//反编码,防止中文
+				console.info(imgUrl);
+                files.push(imgUrl.substring(imgUrl.indexOf("\"") + 1, imgUrl.lastIndexOf("\"")));
+
+            })
+            plus.nativeUI.showWaiting('保存中');
+
+            var task = plus.uploader.createUpload(_IPGLOBAL+"blockchain/saveImageAndVoice", {
+                    method: "POST",
+                    blocksize: 204800,
+                    priority: 100
+                },
+                function(t, status) {
+                    plus.nativeUI.closeWaiting();
+					//触发自定义事件
+					var tab = plus.webview.getWebviewById("time_machine_sub.html");
+					mui.fire(tab,'customEvent');
+					
+                    if(status == 200) {
+						console.info(JSON.stringify(t))
+                        plus.nativeUI.toast("上传成功")
+                    } else {
+                        plus.nativeUI.toast("上传失败：" + status)
+                    }
+                    mui.currentWebview.close();
+                }
+            )
+
+            //循环添加文件
+            for(i in files) {
+                task.addFile(files[i], {
+                    key: 'file' + i,
+                    name: files[i].path
+                });
+            }
+            //添加数据
+            task.addData("uuid", localStorage.getItem("loginInfo"));
+            task.addData("type", optType.dataVal);
+            task.addData("typeId", "1");
+            task.addData("description", description.value);
+
+            task.start(); //开始上传
+        });
+        
+
+        //          //初始化图片域占位
+        //          var newPlaceholder = function() {
+        //              //              var fileInputArray = getFileInputArray();//获取imageList中全部文件
+        //              //              console.info(JSON.stringify(fileInputArray));
+        //              imageIndexIdNum++; //图片索引加1
+        //
+        //              var placeholder = document.createElement('div'); //外层节点
+        //              placeholder.setAttribute('class', 'image-item space');
+        //              var up = document.createElement("div"); //内层加号节点
+        //              up.setAttribute('class', 'image-up')
+        //              //删除图片
+        //              var closeButton = document.createElement('div'); //右上角删除节点
+        //              closeButton.setAttribute('class', 'image-close');
+        //              closeButton.innerHTML = 'X';
+        //              closeButton.id = "img-" + index;
+        //
+        //              //右上角删除节点的点击事件
+        //              closeButton.addEventListener('tap', function() {
+        //                  for(var temp = 0; temp < files.length; temp++) {
+        //                      if(files[temp].id == closeButton.id) {
+        //                          files.splice(temp, 1) //从指定位置删除1个
+        //                      }
+        //                  }
+        //                  console.info(JSON.stringify(placeholder))
+        //                  imageList.removeChild(placeholder); //删除包含删除节点的图片容器
+        //              }, false);
+        //
+        //              //创建文件节点
+        //              var fileInput = document.createElement('div');
+        //              fileInput.setAttribute('class', 'file');
+        //              fileInput.setAttribute('id', 'image-' + imageIndexIdNum);
+        //              fileInput.addEventListener('tap', function(event) {
+        //                  var self = this;
+        //                  var index = (this.id).substr(-1); //获取id后面的数字索引
+        //                  console.info(index);
+        //                  //调用相册、文件选择图片
+        //                  plus.gallery.pick(function(e) {
+        //                      console.info("event：" + JSON.stringify(e));
+        //                      var name = e.substr(e.lastIndexOf('/') + 1);
+        //                      console.info("name：" + name);
+        //                      //压缩成zip文件
+        //                      plus.zip.compressImage({
+        //                          src: e, //获取的图片位置（图片绝对路径）
+        //                          dst: '_doc/' + name, //存放的位置（相对路径）
+        //                          overwrite: true,
+        //                          quality: 50
+        //                      }, function(zip) {
+        //                          size += zip.size;
+        //                          console.info("filesize:" + zip.size + ",totalsize:" + size); //压缩后的大小
+        //                          if(size > (10 * 1024 * 1024)) {
+        //                              return mui.toast("文件过大，请重新选择。。。（10M 以下）");
+        //                          }
+        //
+        //                          if(!self.parentNode.classList.contains('space')) { //该位置已有图片
+        //                              files.splice(index - 1, 1, {
+        //                                  name: "images" + (index - 1),
+        //                                  path: '_doc/' + name,
+        //                                  id: "img-" + (index - 1)
+        //                              });
+        //                          } else { //加号
+        //                              placeholder.classList.remove('space'); //移除space样式，显示删除标签
+        //                              addFile('_doc/' + name);
+        //                              newPlaceholder(); //回调该方法
+        //                          }
+        //
+        //                          up.classList.remove('image-up');
+        //                          placeholder.style.backgroundImage = 'url(' + zip.target + ')'; //设置样式
+        //                      }, function(zipe) {
+        //                          mui.toast('压缩失败！');
+        //                      });
+        //                  }, function(e) {
+        //                      mui.toast("已取消（" + e.message + "）");
+        //                  }, {});
+        //              });
+        //
+        //              placeholder.appendChild(closeButton);
+        //              placeholder.appendChild(up);
+        //              placeholder.appendChild(fileInput);
+        //              imageList.appendChild(placeholder);
+        //          }
+        //          newPlaceholder();
+    </script>
+</body>
+</html>

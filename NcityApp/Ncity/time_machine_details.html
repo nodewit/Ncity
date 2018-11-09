@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="css/mui.css" />
+        <link rel="stylesheet" href="css/previewImage.css" />
+		<link href="css/mui.picker.css" rel="stylesheet" />
+		<link href="css/mui.poppicker.css" rel="stylesheet" />
+		<link href="css/comment.css" rel="stylesheet" />
+		<style>
+			.mui-content{
+				margin-bottom: 49px;
+			}
+			p {
+				margin-top: 25px;
+				font-size: 18px;
+				line-height: 20px;
+				padding-left: 15px;
+			}
+		
+			.image-list {
+				width: 100%;
+				/*height: 85px;*/
+				background-color: #fff;
+				padding: 10px 10px;
+				/*overflow: hidden;*/
+				/*隐藏（超出范围的）选择图片的按钮*/
+			}
+			
+			.image-item {
+				width: 65px;
+				height: 65px;
+				/*background-image: url(../images/iconfont-tianjia.png);*/
+				background-size: 100% 100%;
+				display: inline-block;
+				position: relative;
+				border-radius: 5px;
+				margin-right: 10px;
+				margin-bottom: 10px;
+				/*border: solid 1px #e8e8e8;*/
+				vertical-align: top;
+			}
+			
+			.image-item .file {
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				width: 100%;
+				height: 100%;
+				opacity: 0;
+				cursor: pointer;
+				z-index: 0;
+			}
+			
+			.image-item.space {
+				border: none;
+			}
+			
+			.image-item .image-close {
+				position: absolute;
+				display: inline-block;
+				right: -6px;
+				top: -6px;
+				width: 20px;
+				height: 20px;
+				text-align: center;
+				line-height: 20px;
+				border-radius: 12px;
+				background-color: #FF5053;
+				color: #f3f3f3;
+				border: solid 1px #FF5053;
+				font-size: 9px;
+				font-weight: 200;
+				z-index: 1;
+			}
+			
+			.image-item .image-up {
+				height: 65px;
+				width: 65px;
+				border-radius: 10px;
+				line-height: 58px;
+				border: 1px solid #ccc;
+				color: #ccc;
+				display: inline-block;
+				text-align: center;
+			}
+			
+			.image-item .image-up:after {
+				font-family: "微软雅黑";
+				content: '+';
+				font-size: 60px;
+			}
+			
+			.image-item.space .image-close {
+				display: none;
+			}
+			
+			input, textarea {
+				border: none;
+				height: 100%;
+				padding: 0;
+				margin: 0;
+				vertical-align: middle;
+			}
+			
+			.row{
+				line-height: 50px;
+				background: #fff;
+				padding-left: 20px;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-navbar-inner mui-bar mui-bar-nav">
+			<button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav"></span>时光机
+			</button>
+			<h1 class="mui-center mui-title">详情</h1>
+		</div>
+
+		<div class="mui-content">
+			<p>珍贵记忆</p>
+			<div id='image-list' class="row image-list">
+				<!-- <div id="addImg" class="image-item"> -->
+					<!--<div class="image-close" id="img-0">X</div>-->
+					<!-- <div class="image-up"></div> -->
+					<!--<div class="file" id="image-1"></div>-->
+				<!-- </div> -->
+			</div>
+
+			<p>描述</p>
+			<div class="row">
+				<textarea id="description" readonly="readonly" placeholder="这个人很懒,没有留下描述......"></textarea>
+				<!-- <button>复制</button> -->
+			</div>
+
+			<!-- <p>类型</p>
+			<div class="row" id="opt-type">
+				私密
+			</div> -->
+
+			<p>评论</p>
+			<div class="comment-list">
+                <div style="font-size: 12px;width: 100%;top:0; text-align: center; line-height: 60px;color: #888;position: absolute;z-index: 1;">还没有评论哦，快来抢个沙发吧！</div>
+			</div>
+			<div id="hint" style="font-size: 12px;text-align: center;line-height: 60px;color: #888;">没有更多了</div>
+		</div>
+
+		<div class="commentbox">
+			<div class="footer-left">
+				<i class="mui-icon mui-icon-chatboxes" style="font-size: 28px;"></i>
+			</div>
+			<div class="footer-center">
+				<textarea type="text" class='input-text' id="content"></textarea>
+			</div>
+			<label for="" class="footer-right">
+				<i class="mui-icon mui-icon-arrowthinright" id="comment"></i>
+			</label>
+			<!-- <input placeholder="来说几句吧......" class="myinput" id="content"> -->
+			<!-- <button type="button" class="mui-btn mui-btn-success mui-btn-outlined" >评论</button> -->
+			<!-- <div class="btn btn-info pull-right" id="comment">评论</div> -->
+		</div>
+
+		<script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+		<script type="text/javascript" src="js/mui.picker.js"></script>
+		<script type="text/javascript" src="js/mui.poppicker.js"></script>
+		<script type="text/javascript" src="js/util.js"></script>
+		<script type="text/javascript" src="js/jquery.comment.js"></script>
+        <script type="text/javascript" src="js/mui.previewimage.js"></script>
+        <script type="text/javascript" src="js/mui.zoom.js"></script>
+		<script type="text/javascript">
+			mui.init();
+            var self = null;//本页面对象
+
+			var imageList = document.getElementById('image-list'); //获取放置图片容器
+			var description = document.getElementById('description'); //获取描述信息容器
+			var optType = document.getElementById('opt-type'); //获取选择类型容器
+
+			// 初始化previewImage（图片预览）
+			mui.previewImage();
+            
+			mui.plusReady(function() {
+                //获取该详情的页面对象(获取id)
+				self = plus.webview.currentWebview();
+				self.show("pop-in");
+                console.info(self.dataId)
+                
+                $(function() {
+                    getDataByAjax({
+                    	type: 'GET',
+                    	url: 'blockchain/queryChainById?uuid=' + localStorage.getItem("loginInfo"),
+                    	data: {
+                    		"id": self.dataId
+                    	},
+                    }, function(result) {
+                    	description.innerHTML = result.data.data.description;
+                        var str = "";
+                        $.each(result.data.data.files, function(k, v){
+                            str +='<div class="image-item img" style="background-image:url(' + v.filePath + ')" data-preview-src="" data-preview-group="dtl">' + //图片预览需要将div改为img
+                        		// '<div class="image-close" id="img-0">X</div>' +
+                        		'<div class="file" id="image-1"></div>' +
+                        		'</div>'
+                        })
+//                         	var e = files[i];
+//                         	var name = e.substr(e.lastIndexOf('/') + 1);
+                        	
+                        	$("#image-list").prepend(str);
+                    })
+                    
+                    //调用初始化评论方法
+                    initComment();
+                });//$(function(){})结束
+                
+			});
+		</script>
+	</body>
+</html>

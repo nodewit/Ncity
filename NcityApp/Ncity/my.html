@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+		    .mui-table-view{
+		        margin-top: 20px;
+		    }
+		    
+		    .mui-table-view.userinfo{
+		        margin-top: 0px!important;
+		        height: 130px;
+		        padding-top: 20px;
+		    }
+		    .portrait {
+		        height: 60px;
+		        width: 60px;
+		        border: 1px solid red;
+		        border-radius: 30px;
+		        margin: auto auto 20px;
+		        background: url(img/logo.png) no-repeat center/100% 100%;
+		    }
+		    .desc {
+		        text-align: center;
+		    }
+		</style>
+	</head>
+
+	<body>
+	    <div class="mui-content">
+	        <div id="help" class="help" data-href="help.html" style="position: absolute;right: 10px;top: 10px;color: #bbb;z-index: 2;">
+                <a>帮助</a>
+            </div>
+	        <ul class="mui-table-view userinfo">
+                <div class="portrait"></div>
+                <div class="desc"><label>姓名：</label><span id="name">XXXX</span></div>
+	        </ul>
+	        <ul class="mui-table-view">
+                <li class="mui-table-view-cell" data-href="integral.html">我的灵力</li>
+                <li class="mui-table-view-cell" data-href="diamond.html">我的灵钻</li>
+                <li class="mui-table-view-cell" data-href="invitation.html">我的邀请码</li>
+            </ul>
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell" data-href="setting.html">设置</li>
+            </ul>
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell" id="quit">退出登录</li>
+            </ul>
+	    </div>
+	    
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" src="js/jquery2.1.4.js" ></script>
+		<script type="text/javascript" src="js/util.js" ></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			var nameObj = document.getElementById("name");
+			nameObj.innerHTML = localStorage.getItem("userName");
+			
+			//退出登录
+			document.getElementById("quit").addEventListener("tap",function(){
+			    if(confirm("是否退出登录")){
+                console.info("计入");
+			        localStorage.clear();//将key为phone的数据从本地数据库删除
+			        plus.webview.close("main.html");//关闭main页面
+			    }
+			});
+			//选项的监听事件
+			mui(".mui-table-view").on('tap','li',function(){
+                var dataHref = this.getAttribute("data-href")
+                if(dataHref){
+                    openPage(dataHref);
+                }
+            });
+            //帮助页面
+            document.getElementById("help").addEventListener("tap", function() {
+                var dataHref = this.getAttribute("data-href")
+                if(dataHref){
+                	openPage(dataHref);
+                }
+            });
+			
+            
+//			//取消授权
+//			document.getElementById("help").addEventListener("tap", function() {
+//              //获取授权的服务
+//              plus.oauth.getServices(function(services){
+//                  alert(JSON.stringify(services[0].userInfo));
+//                  if(confirm("是否注销")){
+//                      services[0].logout(function(e){
+//                          alert( "注销登录！"+JSON.stringify(e));
+//  //                      plus.webview.close("main");
+//                      }, function(e){
+//                          alert( "注销登录认证失败！"+JSON.stringify(e));
+//                      });
+//                  }
+//                  
+//              }, function(e){
+//                  alert( "获取分享服务列表失败："+JSON.stringify(e));
+//              });
+//          });
+//          
+		</script>
+	</body>
+
+</html>

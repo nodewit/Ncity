@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.css">
+		<link rel="stylesheet" href="css/audio.css" />
+		<style>
+			.mui-card .custom-card-imgage {
+                height: 90px;
+                /*padding:0 15px;*/
+                text-align: center;
+            }
+            
+            .mui-card-content .custom-card-imgage .custom-card-imgage-img {
+                background: no-repeat left/100% 100%;
+                display: inline-block;
+                width: 30%;
+                height:80px;
+                margin-left: 5px;
+            }
+			
+            .yLike {
+            	color: #88bbdd;
+            }
+        </style>
+	</head>
+
+	<body>
+		<div id="pullrefresh" class="mui-scroll-wrapper mui-content">
+			<div class="mui-scroll">
+
+				<!-- <div class="mui-card">
+                    <div class="mui-card-header mui-card-media">
+                        <img src="img/logo.png" />
+                        <div class="mui-media-body">
+                            小M
+                            <p><span>0000-00-00 00:00</span><span style="float: right;">私密</span></p>
+                        </div>
+                    </div>
+                    <div class="mui-card-content" style="padding: 10px 15px 0 15px;">
+                        <button type="button" class="mui-btn mui-btn-danger mui-btn-block mui-btn-outlined" style="line-height: 10px;">语音播放器</button>
+                    </div>
+                    <div class="mui-card-footer">
+                    	<a class="mui-card-link">
+                    		<span class="'+(v.isLike ? "yLike":"")+'" data-type="'+v.type+'">'+(v.isLike ? "已点赞":"点赞")+
+                    		</span> （<span class="likeNum">'+v.likeNum+'</span>） 、 评论（'+v.commentNum+'）</a>' +
+                    	<a class="mui-card-link"></a>' +
+                    	<a class="mui-card-link" data-id="'+v.id+'">查看详情</a>' +
+                    </div>
+                </div> -->
+
+			</div>
+		</div>
+		<div id="play" class="rp">
+			<div id="ptime" class="ptime">00:00:00/00:00:00</div><br />
+			<div id="progress" class="progress">
+				<div id="schedule" class="schedule"></div>
+			</div>
+			<br />
+			<div class="stop" onclick="stopPlay()"></div>
+		</div>
+		<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+		<script type="text/javascript" src="js/util.js"></script>
+		<script type="text/javascript" src="js/mui.js"></script>
+		<script type="text/javascript" src="js/audio.js"></script>
+        <script type="text/javascript" src="js/isLike.js"></script>
+		<script>
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+						contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+						contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+						auto:true,
+						callback: pulldownRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					},
+					up: {
+						height: 50, //可选.默认50.触发上拉加载拖动距离
+						contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+						contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+						callback: pullupRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					}
+				}
+			});
+
+
+			var pageNumber = 1; //页数（第几页）
+			var pageSize = 10; //每页数量
+			var table = $('.mui-scroll');
+			
+			/*下拉刷新业务实现*/
+			function pulldownRefresh() {
+				getNotice(1, pageSize, function(str) { //刷新固定第一页
+					pageNumber = 1; //初始化页数为第1页
+					table.html(str);
+					mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //结束下拉刷新
+					mui('#pullrefresh').pullRefresh().refresh(true); //重置上拉加载
+				});
+			}
+			/*上拉加载具体业务实现*/
+			function pullupRefresh() {
+				getNotice(++pageNumber, pageSize, function(str) {
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh(str == ""); //参数为true代表没有更多数据了。
+					//$('.mui-scroll .mui-card:last-child').after(str);//在最后一个节点添加新数据
+					table.append(str);
+				});
+			}
+
+			//获取一诺千金信息
+			var getNotice = function(num, size, callback) {
+				getDataByAjax({
+					type: 'GET',
+					url: 'blockchain/queryListChainByPage?uuid=' + localStorage.getItem("loginInfo"),
+					data: {
+						"pageNumber": num,
+						"pageSize": size,
+						"typeId": 2 //1:时光机、2：一诺千金
+					},
+				}, function(result) {
+					var str = '';
+					$.each(result.data, function(k, v) {
+						str += '<div class="mui-card">' +
+							'<div class="mui-card-header mui-card-media">' +
+							'<img src="img/logo.png" />' +
+							'<div class="mui-media-body">' +
+							v.name +
+							'<p><span>' + getMyDate(v.createTime) + '</span><span style="float: right;">' + (v.type ? "公开" : "私密") +
+							'</span></p>' +
+							'</div>' +
+							'</div>' +
+							'<div class="mui-card-content" style="padding: 10px 15px 0 15px;">' +
+							'<button type="button" class="mui-btn mui-btn-danger mui-btn-block mui-btn-outlined play" data-href="' + (v
+								.data.files[0] ? v.data.files[0].filePath : "") + '" style="line-height: 10px;">语音播放器</button>' +
+							'</div>' +
+                            '<div class="mui-card-footer">' +
+                            	'<a class="mui-card-link">'+
+                            		'<span class="'+(v.isLike ? "yLike":"")+'" data-typeid="'+v.typeId+'">'+(v.isLike ? "已点赞":"点赞")+
+                            		'</span> （<span class="likeNum">'+v.likeNum+'</span>） 、 评论（'+v.commentNum+'）</a>' +
+                            	'<a class="mui-card-link"></a>' +
+                            	'<a class="mui-card-link" data-id="'+v.id+'" data-href="promise_details.html">查看详情</a>' +
+                            '</div>' +
+							'</div>';
+					});
+					//调用回调函数
+					callback(str);
+				});
+			};
+
+			//重写关闭
+			mui.back = function(event) {
+				if (ep.style.display == "block") { //重置播放
+					stopPlay();
+				} else {
+					plus.webview.getWebviewById("promise.html").close();//关闭父页面(因为双webview模式)
+				}
+				return false;
+			};
+			
+			//语音播放按钮点击事件
+			$(".mui-scroll").on('click', '.play', function() {
+				var dataHref = this.getAttribute("data-href");
+				console.info("路径("+plus.os.name+")："+dataHref)
+				if(!dataHref){
+					plus.nativeUI.toast("服务器拼命加载中！！！");
+					return;
+				}
+				//判断是否为ios(干脆全部先下载在播放好了)
+				// if(mui.os.ios){
+				downloadCheck(dataHref);//ios需先下载才能播放
+// 				}else{
+// 					startPlay(dataHref);//android直接播放
+// 				}
+			});
+            
+			window.addEventListener('customEvent', function(event) {
+				setTimeout(function(){
+					//触发双webview模式的下拉刷新
+					plus.webview.currentWebview().setBounce({
+						offset: {
+							top: 50 + "px"
+						}
+					});
+				},600)
+			});
+			
+			mui.plusReady(function(){
+				plus.webview.getWebviewById("promise.html").show("pop-in");
+			});
+		</script>
+	</body>
+
+</html>

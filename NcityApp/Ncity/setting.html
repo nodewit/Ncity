@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link href="css/mui.css" rel="stylesheet" />
+        <style>
+            /*.mui-content > .mui-table-view:first-child{
+                margin-top: 0;
+            }*/
+            
+            .mui-table-view {
+                margin-top: 20px;
+            }
+            
+            .mui-table-view span {
+                color: #aaa;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">设置</h1>
+        </header>
+        <div class="mui-content">
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell">
+                    <a>当前账号<span class="mui-pull-right" id="mobile">00000000000</span></a>
+                </li>
+                <li class="mui-table-view-cell">
+                    <a>姓名<span class="mui-pull-right" id="name">XX</span></a>
+                </li>
+                <li class="mui-table-view-cell">
+                    <a>身份证<span class="mui-pull-right" id="idcard"> - - - - - - - - - - </span></a>
+                </li>
+            </ul>
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell" id="version-dom">
+                    <a>版本号<span class="mui-pull-right" id="version">1.0.0</span></a>
+                </li>
+                <li class="mui-table-view-cell">
+                    <a>联系我们<span class="mui-pull-right">666-666-666</span></a>
+                </li>
+            </ul>
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell" id="question" data-href="question.html">意见反馈</li>
+            </ul>
+        </div>
+
+        <script src="js/mui.js"></script>
+        <script type="text/javascript" src="js/jquery2.1.4.js" ></script>
+        <script type="text/javascript" src="js/util.js" ></script>
+        <script type="text/javascript">
+            mui.init();
+            
+            var mobileObj = document.getElementById("mobile");
+            var nameObj = document.getElementById("name");
+            var idcardObj = document.getElementById("idcard");
+            var versionObj = document.getElementById("version");
+			
+			var verDomObj = document.getElementById("version-dom");
+            var question = document.getElementById("question");
+            
+			verDomObj.addEventListener('tap',function(){
+				var osName = plus.os.name;
+				//签到
+				getDataByAjax({
+					type: 'GET',
+					url: 'user/queryVersion?type='+(osName=="Android" ? "2":"1") ,
+				}, function(result) {
+					if(result.data.version == versionObj.innerHTML){
+						plus.nativeUI.toast("已经是最新版本了");
+					}else{
+						if(confirm("检测到新版本，是否下载最新版本？")){
+							plus.nativeUI.toast("下载路径"+result.data.downloadUrl);
+						}
+					}
+					console.info(JSON.stringify(result))
+				});
+			});
+			
+            question.addEventListener('tap',function(){
+                var dataHref = this.getAttribute("data-href");
+                mui.openWindow({
+                    url: dataHref,
+                    id: dataHref
+                });
+            });
+            
+            mui.plusReady(function() {
+//              //查询用户信息
+                var getIntegral = function(){
+                    getDataByAjax({
+                        type:'POST',
+                        url:'queryUserEntityByUuid?uuid='+localStorage.getItem("loginInfo"),
+                    },function(result){
+                        
+                        mobileObj.innerHTML = result.data.mobile;
+                        nameObj.innerHTML = result.data.name;
+                        idcardObj.innerHTML = result.data.idcard;
+                    });
+                }();
+				//显示当前页面
+				plus.webview.currentWebview().show("pop-in")
+            });
+            
+        </script>
+    </body>
+
+</html>

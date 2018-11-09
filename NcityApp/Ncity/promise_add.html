@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="css/mui.css" />
+		<link href="css/mui.picker.css" rel="stylesheet" />
+		<link href="css/mui.poppicker.css" rel="stylesheet" />
+		<link href="css/audio.css" rel="stylesheet" />
+		<style>
+			html,body{
+                height: 100%;
+                width: 100%;
+            }
+            p {
+                margin-top: 25px;
+                font-size: 18px;
+                line-height: 20px;
+                padding-left: 15px;
+            }
+            
+            input {
+                border: none !important;
+            }
+            
+            ul.history {
+                width: 80%;
+                list-style: none;
+                margin: 20px auto 0 auto;
+                padding: 0;
+                box-shadow: 0 0 2px #aaa;
+                /*#dd524d*/
+                font-size: 16px;
+                color: #555;
+            }
+            
+            ul.history li {
+                /*background: #efefef;*/
+                padding-left: 10px;
+                border-bottom: 1px solid #aaa;
+                margin: 0;
+                overflow: hidden;
+            }
+            
+            ul.history li p {
+                margin: 0;
+                padding: 0;
+                font-size: 16px;
+                line-height: 30px;
+                color: #555;
+            }
+            
+            ul.history li span {
+                color: #555;
+                font-size: 12px;
+            }
+            
+            ul.history li>div {
+                float: left;
+                height: 55px;
+                display: inline-block;
+            }
+            
+            ul.history li .his-left {
+                text-align: left;
+                width: 80%;
+            }
+            
+            ul.history li .his-right {
+                line-height: 55px;
+                width: 20%;
+            }
+            
+            ul.history li .his-right button {
+                width: 100%;
+                padding: 0;
+                line-height: 25px;
+                display: block;
+            }
+            
+            .row {
+                width: 100%;
+                text-align: center;
+                background-color: #fff;
+                padding: 10px 10px;
+                overflow: hidden;
+            }
+            
+            .bottom {
+                margin-top: 100px;
+                text-align: center;
+            }
+            
+            .bottom button {
+                width: 80%;
+                line-height: 30px;
+            }
+			
+        </style>
+	</head>
+
+	<body>
+		<div class="mui-navbar-inner mui-bar mui-bar-nav">
+			<button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav"></span>一诺千金
+			</button>
+			<h1 class="mui-center mui-title">承诺</h1>
+		</div>
+
+		<div class="mui-content feedback">
+			<p>一诺千金</p>
+			<div class="row">
+				<button id="recording" class="mui-btn mui-btn-danger mui-btn-outlined">点击录音</button>
+				<ul id="history" class="history">
+					无记录
+				</ul>
+			</div>
+
+			<p>类型</p>
+			<div>
+				<input id='opt-type' type="text" class="mui-input-clear contact" placeholder="(公开、私密)" readonly="" />
+			</div>
+			<div style="font-size: 12px;text-align: center;height: 40px;color: #aaa;">注：数据上链后将无法删除和修改，请谨慎填写。</div>
+
+			<div class="bottom">
+				<button id="submit" type="button" class="mui-btn mui-btn-primary">保存</button>
+			</div>
+		</div>
+
+		<div id="play" class="rp">
+			<div id="ptime" class="ptime">00:00:00/00:00:00</div><br />
+			<div id="progress" class="progress">
+				<div id="schedule" class="schedule"></div>
+			</div>
+			<br />
+			<div class="stop" onclick="stopPlay()"></div>
+		</div>
+		<div id="record" class="rp">
+			<div style="width:100%;height:20%;"></div>
+			<div class="rprogress">
+				<div class="rschedule"></div>
+			</div>
+			<br />
+			<div id="rtime" class="rtime">00:00:00</div><br />
+			<div class="stop" onclick="stopRecord()"></div>
+		</div>
+
+
+		<script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+		<script type="text/javascript" src="js/mui.picker.js"></script>
+		<script type="text/javascript" src="js/mui.poppicker.js"></script>
+		<script type="text/javascript" src="js/util.js"></script>
+		<script src="js/audio.js"></script>
+		<script type="text/javascript">
+			mui.init();
+
+			var recording = document.getElementById('recording'); //获取录音按钮
+			var optType = document.getElementById('opt-type'); //获取选择类型容器
+
+			//      var index = 0;
+
+			//初始化选择器
+			var picker = new mui.PopPicker();
+			picker.setData([{
+				value: '1',
+				text: '公开'
+			}, {
+				value: '0',
+				text: '私密'
+			}]);
+			optType.addEventListener('tap', function(event) {
+				picker.show(function(items) {
+					optType.value = items[0].text; //设置文本
+					optType.dataVal = items[0].value; //设置属性（这样设置无法通过getAttribute获取，自己obj.dataVal就可以了）
+				});
+			});
+
+			var entry = null;
+			//创建录音记录
+			function createItem() {
+				//获取目录属性
+				entry.getMetadata(function(metadata) {
+					$("#history").html('<li onclick="startPlay(\'_doc/audio/\'+entry.name)">' +
+						'<div class="his-left">' +
+						'<p>' + entry.name + '</p>' +
+						'<span>' + getMyDate(metadata.modificationTime.getTime()) + '</span>' +
+						'</div>' +
+						'<div class="his-right">' +
+						'<i class="mui-icon mui-icon-spinner mui-spin"></i>' +
+						'</div>' +
+						'</li>');
+				}, function(e) {
+					plus.nativeUI.toast('获取文件"' + entry.name + '"信息失败：' + e.message);
+				});
+			}
+
+			//录音相关属性
+			var er = document.getElementById("record"); //录音界面
+			var rt = document.getElementById('rtime'); //录音计时显示
+			var rudio = null; //声明录音对象
+			var ri = null; //录音计时器
+			var t = 0; //录音时间
+
+			//开始录音
+			recording.addEventListener('tap', function() {
+				console.info("录音进入");
+
+				if (entry) { //不为空，则先删除已经存在的录音
+					clearRecord();
+				}
+
+				rudio = plus.audio.getRecorder(); //获取当前设备的录音对象
+				rudio.record({
+					filename: "_doc/audio/",
+					format: "mp3"
+				}, function(path) {
+					plus.nativeUI.toast("录音完成");
+					//通过io模块来获取文件信息
+					plus.io.resolveLocalFileSystemURL(path, function(ent) {
+						entry = ent; //赋值给全局变量
+						recording.innerHTML = "重新录音";
+						createItem(entry); //创建节点
+					}, function(e) {
+						plus.nativeUI.toast('读取录音文件错误：' + e.message);
+					});
+				}, function(e) {
+					plus.nativeUI.toast("录音失败: " + e.message);
+				});
+
+				er.style.display = 'block'; //显示录音界面
+				t = 0; //初始化录音时间
+				ri = setInterval(function() {
+					t++;
+					rt.innerText = timeToStr(t);
+				}, 1000);
+			});
+			// 停止录音
+			function stopRecord() {
+				er.style.display = 'none'; //隐藏录音界面
+				rt.innerText = '00:00:00'; //初始化计时容器
+				clearInterval(ri); //清除计时器
+				ri = null; //并初始化计时器变量为null(清除内存占用)
+				rudio.stop(); //完成录音
+				rudio = null; //初始化为null
+				t = 0; //初始化时间为0
+			}
+
+			//清除录音方法
+			function clearRecord(quit) {
+				if (entry) {
+					//删除录音文件
+					entry.remove(function() {
+						//重置完成退出
+						if (quit) {
+							plus.webview.currentWebview().close();
+							// plus.nativeUI.toast("删除录音成功");
+						}
+					}, function(e) {
+						plus.nativeUI.toast("重置录音失败（录音是否已手动删除）：\n" + JSON.stringify(e))
+					});
+				}else{
+					plus.webview.currentWebview().close();//直接退出
+				}
+			}
+			//重写关闭
+			mui.back = function(event) {
+				if (er.style.display == "block") { //重置录音
+					stopRecord();
+				} else if (ep.style.display == "block") { //重置播放
+					stopPlay();
+				} else {
+					clearRecord(true);
+				}
+
+				return false;
+			};
+
+			//保存录音
+			document.getElementById("submit").addEventListener('tap', function() {
+				console.info("选择的类型：" + optType.dataVal);
+				if(!entry){
+					plus.nativeUI.toast('请先记录您的录音...');
+					return ;
+				}
+				if(!optType.dataVal){
+					plus.nativeUI.toast('请选择保存类型...');
+					return ;
+				}
+				plus.nativeUI.showWaiting('保存中');
+				var task = plus.uploader.createUpload(_IPGLOBAL+"blockchain/saveImageAndVoice", {//_IPGLOBAL + 
+						method: "POST",
+						blocksize: 204800,//分块上传(byte)
+						priority: 100//优先级
+					},
+					function(t, status) {
+						plus.nativeUI.closeWaiting();
+						
+						//触发自定义事件
+						var tab = plus.webview.getWebviewById("promise_sub.html");
+						mui.fire(tab,'customEvent');
+						
+						if (status == 200) {
+							plus.nativeUI.toast("上传成功")
+						} else {
+							plus.nativeUI.toast("上传失败：" + status)
+						}
+						mui.back();
+					}
+				)
+				
+				//添加文件
+				task.addFile("_doc/audio/"+entry.name, {key: 'file',name: entry.name});
+				//添加数据
+				task.addData("uuid", localStorage.getItem("loginInfo"));
+				task.addData("type", optType.dataVal);
+				task.addData("typeId", "2");
+
+				task.start(); //开始上传
+			});
+
+		</script>
+	</body>
+
+</html>

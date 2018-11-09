@@ -1,0 +1,85 @@
+{
+  "main.html": {
+    "resources": [
+      "login.html",
+      "index.html"
+    ],
+    "refer": [
+      "login.html",
+      "index.html",
+      "my.html",
+      "new.html"
+    ]
+  },
+  "login.html": {
+    "refer": [
+      "main.html",
+      "register.html",
+      "bind.html"
+    ],
+    "resources": []
+  },
+  "my.html": {
+    "refer": [
+      "login.html",
+      "diamond.html",
+      "setting.html",
+      "integral.html"
+    ],
+    "resources": []
+  },
+  "register.html": {
+    "refer": [
+      "main.html",
+      "bind.html"
+    ],
+    "resources": []
+  },
+  "bind.html": {
+    "refer": [
+      "main.html"
+    ],
+    "resources": []
+  },
+  "index.html": {
+    "refer": [
+      "notice.html",
+      "time_machine_sub.html",
+      "time_machine.html",
+      "promise.html",
+      "diamond.html",
+      "integral.html",
+      "setting.html"
+    ],
+    "resources": []
+  },
+  "notice.html": {
+    "resources": [
+      "notice_sub.html"
+    ],
+    "refer": [
+      "notice_sub.html"
+    ]
+  },
+  "time_machine.html": {
+    "resources": [
+      "time_machine_sub.html"
+    ],
+    "refer": [
+      "time_machine_sub.html",
+      "time_machine_add.html"
+    ]
+  },
+  "promise.html": {
+    "refer": [
+      "time_machine_add.html",
+      "promise_add.html"
+    ],
+    "resources": []
+  },
+  "setting.html": {
+    "refer": [
+      "question.html"
+    ]
+  }
+}

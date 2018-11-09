@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style>
+			.mui-content{
+				text-align: center;
+				padding: 0 30px 20px 30px;
+			}
+			
+			h1{
+				margin: 50px 0 30px 0;
+				color: #007aff;
+			}
+			
+			.mui-btn{
+				width: 80px; 
+				line-height: 20px; 
+				font-size: 16px ;
+				margin: auto;
+				padding: 2px;
+				
+			}
+
+			.row{
+				margin-top: 20px;
+				box-shadow: 0 0 2px #007aff;
+			}
+			
+			.custom-invi{
+				height: 350px;
+				padding: 20px 40px 0 40px;
+			}
+			.custom-invi h2{
+				margin: 15px;
+				color: #00a7ff;
+			}
+			.custom-invi hr{
+				margin: 20px 0 15px 0;
+				height:2px;
+				border:none;
+				border-top:1px dotted #007aff;
+			}
+			
+			.custom-rules{
+				padding: 15px;
+				text-align: left;
+			}
+			.custom-rules p{
+				color: #007aff;
+			}
+			.custom-rules p:first-child{
+				text-align: center;
+				margin-bottom: 18px;
+			}
+		</style>
+	</head>
+		
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">邀请码</h1>
+		</header>
+		
+		<div class="mui-content">
+			<h1>诺诚</h1>
+			
+			<div class="custom-invi row">
+				<p>您的邀请码</p>
+				<h2 id="invitation"> - - - - </h2>
+				<button type="button" class="mui-btn mui-btn-blue mui-btn-block">复制</button>
+				
+				<hr />
+				
+				<img src="img/QRCode.png" style="height: 150px;width: 150px;" />
+			</div>
+			
+			<div class="custom-rules row">
+				<p>奖励规则</p>
+				<p>1.每人总共可邀请xx位好友加入诺诚。</p>
+				<p>2.第一名好友可以获取xxxxxxx。之后的好友xxxxxx。吧啦吧啦吧啦。</p>
+			</div>
+			
+		</div>
+		
+		<script src="js/mui.js"></script>
+		<script type="text/javascript" src="js/jquery2.1.4.js" ></script>
+		<script type="text/javascript" src="js/util.js" ></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			var inviObj = document.getElementById("invitation");
+			
+			//获取文本,复制到剪切板
+			$("button").on('tap',function(){
+				var oInput = document.createElement('input');//需要一个input来临时存放
+				oInput.value = inviObj.innerHTML;
+				document.body.appendChild(oInput);
+				oInput.select(); // 选择对象
+				document.execCommand("Copy"); // 执行浏览器复制命令
+				oInput.style.display='none';
+				
+				plus.nativeUI.toast("复制成功");
+			});
+			
+			mui.plusReady(function() {
+				//获取邀请码
+				getDataByAjax({
+					type:'POST',
+					url:'queryUserEntityByUuid?uuid='+localStorage.getItem("loginInfo"),
+				},function(result){
+					inviObj.innerHTML = result.data.invitationCode;
+				});
+				
+				
+				//显示当前页面
+				plus.webview.currentWebview().show("pop-in", 200);
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Document</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link rel="stylesheet" type="text/css" href="css/mui.css" />
+        <style>
+            p {
+                border-bottom: 1px solid #eee;
+                padding-left: 15px;
+                line-height: 40px;
+                color: #000;
+                font-size: 16px;
+                margin: 0;
+            }
+            
+            .mui-scroll>div~div {
+                margin-top: 20px;
+            }
+            
+            .custom-amount {
+                padding: 0 15px 20px 15px;
+                background: #8A6DE9;
+            }
+            
+            .custom-amount p {
+                padding: 0;
+                border: 0;
+                font-size: 14px;
+                color: #eee;
+            }
+            
+            .custom-amount .custom-amount-sum {
+                color: #fff;
+                font-size: 50px;
+                line-height: 60px;
+            }
+            
+            .custom-amount .custom-amount-sum a {
+                font-size: 22px;
+                color: #fff;
+                float: right;
+            }
+            
+            .custom-intro {
+                background: #fff;
+            }
+            
+            .custom-intro div {
+                padding: 10px 15px 20px 15px;
+                color: #333;
+                font-size: 14px;
+            }
+            
+            .custom-record {
+                background: #fff;
+            }
+            
+            .mui-table-view {
+                padding-left: 15px;
+            }
+            
+            .mui-table-view-cell {
+                height: 70px;
+                padding-left: 0;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .mui-table-view-cell .sum {
+                height: 100%;
+                line-height: 50px;
+                text-align: center;
+                color: #dd1100;
+            }
+            
+            .mui-table-view-cell h5 {
+                color: #333;
+                height: 20px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">灵力记录</h1>
+        </header>
+
+        <div class="mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <div class="custom-amount">
+                    <p>灵力总数</p>
+                    <div class="custom-amount-sum" id="sum">
+                        0
+                    </div>
+                </div>
+
+
+                <div class="custom-intro">
+                    <p>灵力简介</p>
+                    <div>
+						灵力是用户获取灵钻的影响因子,同一时段内,原力越高,获取的灵钻越多。原力分为永生原力和魔法原力两种类型。
+						永生原力长期生效,能够持续参与灵钻分配;魔法原力一般数值较大,但有固定生效期,仅在生效期内可参与灵钻分配,超过期限将会自动失效。
+						可以通过在诺诚上进行浏览、学习、社交等活动,获得原力,由于目前诺诚社区正在前期搭建中,未来将支持更多的原力获取方式。
+					</div>
+                </div>
+
+                <div class="custom-record">
+                    <p>收支记录</p>
+                    <ul class="mui-table-view">
+                        <!--<li class="mui-table-view-cell mui-row">
+                            <div class="mui-col-xs-9">
+                                <h5>日常领取</h5>
+                                <h6>0000-00-00 00:00</h6>
+                            </div>
+                            <div class="mui-col-xs-3 sum">
+                                +0.00000
+                            </div>
+                        </li>-->
+                        
+
+                    </ul>
+                </div>
+                
+                <div id="hint" style="font-size: 12px;text-align: center;height: 40px;"> </div>
+                
+            </div>
+        </div>
+        <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+        <script type="text/javascript" src="js/util.js"></script>
+        <script type="text/javascript">
+            mui.init();
+			var singInType = ["签到","邀请好友","新用户注册"];
+            
+            var pageNumber = 1;
+            
+            mui('.mui-scroll-wrapper').scroll({
+                scrollY: true,
+                indicators: false, //是否显示滚动条
+                deceleration: 0.007, //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+                bounce: false //是否启用回弹
+            });
+            
+            //获取灵钻收支记录
+            var getLog = function() {
+                getDataByAjax({
+                    type: 'GET',
+                    url: 'user/queryListByPage',
+                    data: {
+                        uuid: localStorage.getItem("loginInfo"),
+                        pageSize: 10,
+                        pageNumber: pageNumber
+                    },
+                }, function(result) {
+					console.info(JSON.stringify(result))
+                    pageNumber++;
+                    if(result.data.length > 9) { //如果成功查询出大于10条，则显示'点击加载更多'
+                        $("#hint").html("点击加载更多").css("color", "#007aff");
+                    } else {
+                        $("#hint").html("没有更多了").css("color", "#aaa");
+                    }
+
+                    var str = '';
+                    mui.each(result.data, function(k, v) {
+                        str += '<li class="mui-table-view-cell mui-row">' +
+                            '<div class="mui-col-xs-9">' +
+                            '<h5>'+singInType[(v.type-1)]+'</h5>' +
+                            '<h6>' + getMyDate(v.createTime) + '</h6>' +
+                            '</div>' +
+                            '<div class="mui-col-xs-3 sum">灵力：+' + v.integral + '</div>' +
+                            '</li>';
+                    });
+                    $('.mui-table-view').append(str);
+                });
+            };
+            
+            //点击加载更多
+            $("#hint").on('tap',function(){
+                if(this.innerHTML=="点击加载更多"){//如果与到编码问题再说吧。
+                    getLog();
+                }
+            });
+
+            mui.plusReady(function() {
+				//显示当前页面
+				plus.webview.currentWebview().show("pop-in", 200);
+                //显示灵力（查询用户信息）
+                var getIntegral = function() {
+                    getDataByAjax({
+                        type: 'POST',
+                        url: 'queryUserEntityByUuid?uuid=' + localStorage.getItem("loginInfo"),
+                    }, function(result) {
+                        $('#sum').html(result.data.integral);
+                    });
+                }();
+                getLog();//查询记录
+                
+            });
+        </script>
+    </body>
+
+</html>

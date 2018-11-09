@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Hello MUI</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <!--标准mui.css-->
+        <link rel="stylesheet" href="css/mui.css">
+    </head>
+
+
+    <body>
+        <div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <!--<div class="mui-card">
+                    <div class="mui-card-header">通知标题:1</div>
+                    <div class="mui-card-content">
+                        <div class="mui-card-content-inner">
+                            包含页眉页脚的卡片，页眉常用来显示面板标题，页脚用来显示额外信息或支持的操作（比如点赞、评论等）
+                        </div>
+                    </div>
+                    <div class="mui-card-footer" style="justify-content:flex-end">
+                        <a>查看更多</a>
+                    </div>
+                </div>-->
+               
+            </div>
+        </div>
+
+        <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+        <script type="text/javascript" src="js/util.js" ></script>
+        <script src="js/mui.js"></script>
+        <script>
+            mui.init({
+                pullRefresh: {//配置上拉刷新、下拉加载
+                    container: '#pullrefresh',
+                    down: {
+                        contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                        contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                        contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                        auto:true,
+                        callback: pulldownRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+                    },
+                    up: {
+                        contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+                        contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+                        callback: pullupRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+                    }
+                }
+            });
+            
+            var pageNumber = 1;//页数（第几页）
+            var pageSize = 5;//每页数量
+            var table = $('.mui-scroll');
+            
+            /*下拉刷新具体业务实现*/
+            function pulldownRefresh() {
+                getNotice(1,pageSize,function(str){//刷新固定第一页
+                    pageNumber=1;//初始化页数为第1页
+                    table.html(str);
+                    mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+                    mui('#pullrefresh').pullRefresh().refresh(true);//重置上拉加载
+                });
+            }
+            /*上拉加载具体业务实现=*/
+            function pullupRefresh() {
+                getNotice(++pageNumber,pageSize,function(str){
+                    mui('#pullrefresh').pullRefresh().endPullupToRefresh(str==""); //参数为true代表没有更多数据了。
+                    table.append(str);
+                });
+            }
+            
+            //获取通知方法
+            var getNotice = function(pageNumber,pageSize,callback){
+                getDataByAjax({
+                    type:'GET',
+                    url: 'queryListByPage',
+                    data:{"pageNumber":pageNumber,"pageSize":pageSize},
+                },function(result) {
+                    var str = '';
+                    $.each(result.data,function(k,v){
+                        str +=  '<div class="mui-card">' +
+                                    '<div class="mui-card-header">'+v.id+'、'+v.title+'</div>' +
+                                    '<div class="mui-card-content">' +
+                                    '<div class="mui-card-content-inner">'+ v.content +'</div>' +
+                                    '</div>' +
+                                    '<div class="mui-card-footer" style="justify-content:flex-end">' +
+                                    '<a>查看更多</a>' +
+                                    '</div>' +
+                                '</div>'; 
+                    })
+                    //调用回调函数
+                    callback(str);
+                });
+            };
+            
+            mui.plusReady(function(){
+                //太快了
+                // setTimeout(function(){
+                    plus.webview.getWebviewById("notice.html").show("pop-in");
+                // },100)
+            });
+        </script>
+    </body>
+
+</html>

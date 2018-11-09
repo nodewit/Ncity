@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="css/mui.css" />
+		<link href="css/mui.picker.css" rel="stylesheet" />
+		<link href="css/mui.poppicker.css" rel="stylesheet" />
+		<link href="css/audio.css" rel="stylesheet" />
+		<link href="css/comment.css" rel="stylesheet" />
+		<style>
+			html,body{
+        	height: 100%;
+        	width: 100%;
+        }
+        p {
+            margin-top: 25px;
+            font-size: 18px;
+            line-height: 20px;
+            padding-left: 15px;
+        }
+		
+		ul.history {
+			text-align: center;
+			width: 80%;
+			list-style: none;
+			margin: 20px auto 0 auto;
+			padding: 0;
+			box-shadow: 0 0 2px #aaa;
+			/*#dd524d*/
+			font-size: 16px;
+			color: #555;
+		}
+		
+		ul.history li {
+			/*background: #efefef;*/
+			padding-left: 10px;
+			border-bottom: 1px solid #aaa;
+			margin: 0;
+			overflow: hidden;
+		}
+		
+		ul.history li p {
+			margin: 0;
+			padding: 0;
+			font-size: 16px;
+			line-height: 30px;
+			color: #555;
+		}
+		
+		ul.history li span {
+			color: #555;
+			font-size: 12px;
+		}
+		
+		ul.history li>div {
+			float: left;
+			height: 55px;
+			display: inline-block;
+		}
+		
+		ul.history li .his-left {
+			text-align: left;
+			width: 80%;
+		}
+		
+		ul.history li .his-right {
+			line-height: 55px;
+			width: 20%;
+		}
+		
+		ul.history li .his-right button {
+			width: 100%;
+			padding: 0;
+			line-height: 25px;
+			display: block;
+		}
+        
+        textarea {
+            border: none;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			vertical-align: middle;
+        }
+		.row {
+			width: 100%;
+			text-align: center;
+			background-color: #fff;
+			padding: 10px 10px;
+			overflow: hidden;
+		}
+    </style>
+	</head>
+
+	<body>
+		<div class="mui-navbar-inner mui-bar mui-bar-nav">
+			<button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav"></span>一诺千金
+			</button>
+			<h1 class="mui-center mui-title">详情</h1>
+		</div>
+
+		<div class="mui-content">
+			<p>一诺千金</p>
+			<div class="row">
+				<ul id="history" class="history">
+					无记录
+				</ul>
+			</div>
+
+			<p>描述</p>
+			<div class="row">
+				<textarea id="description" readonly="readonly" placeholder="这个人很懒,没有留下描述......"></textarea>
+				<!-- <button>复制</button> -->
+			</div>
+
+			<p>评论</p>
+			<div class="comment-list">
+				<div style="font-size: 12px;width: 100%;top:0; text-align: center; line-height: 60px;color: #888;position: absolute;z-index: 1;">还没有评论哦，快来抢个沙发吧！</div>
+			</div>
+			<div id="hint" style="font-size: 12px;text-align: center;line-height: 60px;color: #888;">没有更多了</div>
+
+
+			<div id="play" class="rp">
+				<div id="ptime" class="ptime">00:00:00/00:00:00</div><br />
+				<div id="progress" class="progress">
+					<div id="schedule" class="schedule"></div>
+				</div>
+				<br />
+				<div class="stop" onclick="stopPlay()"></div>
+			</div>
+
+		</div>
+		<div class="commentbox">
+			<div class="footer-left">
+				<i class="mui-icon mui-icon-chatboxes" style="font-size: 28px;"></i>
+			</div>
+			<div class="footer-center">
+				<textarea type="text" class='input-text' id="content"></textarea>
+			</div>
+			<label for="" class="footer-right">
+				<i class="mui-icon mui-icon-arrowthinright" id="comment"></i>
+			</label>
+		</div>
+
+		<script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+		<script type="text/javascript" src="js/mui.picker.js"></script>
+		<script type="text/javascript" src="js/mui.poppicker.js"></script>
+		<script type="text/javascript" src="js/util.js"></script>
+		<script src="js/audio.js"></script>
+		<script type="text/javascript" src="js/jquery.comment.js"></script>
+		<script type="text/javascript">
+			mui.init();
+
+			var description = document.getElementById('description'); //描述
+            
+            //语音播放按钮点击事件
+            function detailPlay(dataHref){
+                console.info("路径("+plus.os.name+")："+dataHref)
+                if(!dataHref){
+                    plus.nativeUI.toast("服务器拼命加载中！！！");
+                    return;
+                }
+                //判断是否为ios
+                downloadCheck(dataHref);//ios需先下载才能播放
+            }
+                
+
+			mui.plusReady(function() {
+				//获取该详情的页面对象(获取id)
+				self = plus.webview.currentWebview();
+				self.show("pop-in");
+				console.info(self.dataId)
+
+				$(function() {
+					getDataByAjax({
+						type: 'GET',
+						url: 'blockchain/queryChainById?uuid=' + localStorage.getItem("loginInfo"),
+						data: {
+							"id": self.dataId
+						},
+					}, function(result) {
+						description.innerHTML = result.data.data.description;
+						var files = result.data.data.files;
+						if (files && files[0]) {
+							$("#history").html('<li onclick="detailPlay(\'' + files[0].filePath + '\')">' +
+								'<div class="his-left">' +
+								'<p>' + files[0].uploadFileName + '</p>' +
+								'<span>' + getMyDate(result.data.createTime) + '</span>' +
+								'</div>' +
+								'<div class="his-right">' +
+								'<i class="mui-icon mui-icon-spinner mui-spin"></i>' +
+								'</div>' +
+								'</li>');
+						}
+
+					})
+
+					//调用初始化评论方法
+					initComment();
+				}); //$(function(){})结束
+
+			});
+		</script>
+	</body>
+</html>

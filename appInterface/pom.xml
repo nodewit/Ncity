@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com</groupId>
+	<artifactId>appInterface</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+	<name>appInterface</name>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.2.RELEASE</version>
+		<relativePath />
+	</parent>
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<swagger2markup.version>1.2.0</swagger2markup.version>
+		<asciidoctor.input.directory>${project.basedir}/src/docs/asciidoc</asciidoctor.input.directory>
+		<swagger.output.dir>${project.build.directory}/swagger</swagger.output.dir>
+		<swagger.snippetOutput.dir>${project.build.directory}/asciidoc/snippets</swagger.snippetOutput.dir>
+		<generated.asciidoc.directory>${project.build.directory}/asciidoc/generated</generated.asciidoc.directory>
+		<asciidoctor.html.output.directory>${project.build.directory}/asciidoc/html</asciidoctor.html.output.directory>
+		<asciidoctor.pdf.output.directory>${project.build.directory}/asciidoc/pdf</asciidoctor.pdf.output.directory>
+		<swagger.input>${swagger.output.dir}/swagger.json</swagger.input>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-logging-juli</artifactId>
+			<version>8.0.23</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
+
+		<!-- MYSQL -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<!-- Spring Boot JDBC -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cn.apiclub.tool</groupId>
+			<artifactId>simplecaptcha</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160810</version>
+		</dependency>
+
+		<!--启用不严格检查html -->
+		<dependency>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+			<version>1.9.22</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.47</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.liferay</groupId>
+			<artifactId>org.apache.commons.fileupload</artifactId>
+			<version>1.2.2.LIFERAY-PATCHED-1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<version>7.2.11</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>3.3.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.6.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.qiniu</groupId>
+			<artifactId>happy-dns-java</artifactId>
+			<version>0.1.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+		<!--离线文档 -->
+		<dependency>
+			<groupId>org.springframework.restdocs</groupId>
+			<artifactId>spring-restdocs-mockmvc</artifactId>
+			<version>1.1.2.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<!--springfox-staticdocs 生成静态文档 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-staticdocs</artifactId>
+			<version>2.6.1</version>
+		</dependency>
+		<!-- jpa -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!-- bigchaindb -->
+		<dependency>
+			<groupId>com.bigchaindb</groupId>
+			<artifactId>bigchaindb-driver</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<!-- 云片sdk -->
+		<dependency>
+			<groupId>com.yunpian.sdk</groupId>
+			<artifactId>yunpian-java-sdk</artifactId>
+			<version>1.2.7</version>
+		</dependency>
+
+		<!-- JSONObject -->
+		<dependency>
+			<groupId>net.sf.ezmorph</groupId>
+			<artifactId>ezmorph</artifactId>
+			<version>1.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.2.3</version>
+			<classifier>jdk15</classifier><!-- 指定jdk版本 -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.kevinsawicki</groupId>
+			<artifactId>http-request</artifactId>
+			<version>6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.2</version>
+		</dependency>
+
+		<!-- ipfs -->
+		<dependency>
+			<groupId>com.github.ipfs</groupId>
+			<artifactId>java-ipfs-api</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ipfs.cid</groupId>
+			<artifactId>cid</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.ipfs.api</groupId>
+			<artifactId>multiaddr</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ipfs.multibase</groupId>
+			<artifactId>multibase</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ipfs.multihash</groupId>
+			<artifactId>multihash</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.ethz.ganymed</groupId>
+			<artifactId>ganymed-ssh2</artifactId>
+			<version>262</version>
+		</dependency>
+
+		<!-- activemq -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-activemq</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin </artifactId>
+				<configuration>
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+			<!-- 以下用于生成adoc文件的配置 -->
+			<plugin>
+				<groupId>io.github.swagger2markup</groupId>
+				<artifactId>swagger2markup-maven-plugin</artifactId>
+				<version>${swagger2markup.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>io.github.swagger2markup</groupId>
+						<artifactId>swagger2markup-import-files-ext</artifactId>
+						<version>${swagger2markup.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>io.github.swagger2markup</groupId>
+						<artifactId>swagger2markup-spring-restdocs-ext</artifactId>
+						<version>${swagger2markup.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<swaggerInput>${swagger.input}</swaggerInput>
+					<outputDir>${generated.asciidoc.directory}</outputDir>
+					<config>
+						<swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+						<swagger2markup.pathsGroupedBy>TAGS</swagger2markup.pathsGroupedBy>
+						<swagger2markup.extensions.dynamicOverview.contentPath>${project.basedir}/src/docs/asciidoc/extensions/overview</swagger2markup.extensions.dynamicOverview.contentPath>
+						<swagger2markup.extensions.dynamicDefinitions.contentPath>${project.basedir}/src/docs/asciidoc/extensions/definitions</swagger2markup.extensions.dynamicDefinitions.contentPath>
+						<swagger2markup.extensions.dynamicPaths.contentPath>${project.basedir}/src/docs/asciidoc/extensions/paths</swagger2markup.extensions.dynamicPaths.contentPath>
+						<swagger2markup.extensions.dynamicSecurity.contentPath>${project.basedir}src/docs/asciidoc/extensions/security/</swagger2markup.extensions.dynamicSecurity.contentPath>
+						<swagger2markup.extensions.springRestDocs.snippetBaseUri>${swagger.snippetOutput.dir}</swagger2markup.extensions.springRestDocs.snippetBaseUri>
+						<swagger2markup.extensions.springRestDocs.defaultSnippets>true</swagger2markup.extensions.springRestDocs.defaultSnippets>
+					</config>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>convertSwagger2markup</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin><!-- 以下配置用于生成html和pdf -->
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.3</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctorj-pdf</artifactId>
+						<version>1.5.0-alpha.10.1</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jruby</groupId>
+						<artifactId>jruby-complete</artifactId>
+						<version>1.7.21</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<sourceDirectory>${asciidoctor.input.directory}</sourceDirectory>
+					<sourceDocumentName>index.adoc</sourceDocumentName>
+					<attributes>
+						<doctype>book</doctype>
+						<toc>left</toc>
+						<toclevels>3</toclevels>
+						<numbered></numbered>
+						<hardbreaks></hardbreaks>
+						<sectlinks></sectlinks>
+						<sectanchors></sectanchors>
+						<generated>${generated.asciidoc.directory}</generated>
+					</attributes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>test</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html5</backend>
+							<outputDirectory>${asciidoctor.html.output.directory}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>output-pdf</id>
+						<phase>test</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>pdf</backend>
+							<outputDirectory>${asciidoctor.pdf.output.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

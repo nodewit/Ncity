@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="css/mui.css"/>
+    <style>
+        .logo {
+            width: 84%;
+            margin: 10% auto 15% auto;
+        }
+        .logo img{
+            width: 100%;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .login-form-info {
+            /*height: 250px;*/
+            width: 90%;
+            margin: 15% auto 0 auto;
+        }
+        
+        .login-form-info .form-row {
+            height: 40px;
+            line-height: 40px;
+        }
+        
+        .login-form-info label{
+            display: inline-block;
+            width: 20%;
+        }
+        
+        .login-form-info .mui-input{
+            margin-bottom: 0;
+            width: 78%;
+            border: 0 ;
+            padding: 0;
+            border-bottom: 1px #c8c7cc solid;
+            border-radius: 0;
+            background-color: transparent;
+            -webkit-box-shadow: none;
+                    box-shadow: none;
+        }
+        
+        .login-form-info .phone-number{
+            width: 53%;
+        }
+        .login-form-info .phone-number~button{
+            
+            width: 23%;
+        }
+        
+        .mui-content-padded button {
+            height: 40px;
+            line-height: 40px;
+            padding: 0;
+        }
+        
+        .link-area {
+            display: block;
+            margin-top: 18px;
+            text-align: right;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="mui-content">
+        <div class="logo">
+            <img src="img/card1-1.png" />
+        </div>
+        <form id='register-form' class="login-form-info">
+            <input type="hidden" id="openid" value=""/>
+            <div class="form-row">
+                <label>手机号</label>
+                <input id="mobile" name="mobile" class="mui-input phone-number" placeholder="请输入手机号" value="18973576322"/>
+                <button type="button" id="getcode" class="mui-btn mui-btn-primary mui-btn-outlined">验证码</button>
+            </div>
+            <div class="form-row">
+                <label>验证码</label>
+                <input id="code" class="mui-input" placeholder="请获取验证码" value=""/>
+            </div>
+        </form>
+        <div class="mui-content-padded">
+            <button id='bind' class="mui-btn mui-btn-block mui-btn-primary">绑定账号</button>
+        </div>
+    </div>
+    <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery2.1.4.js" ></script>
+    <script type="text/javascript" src="js/util.js" ></script>
+    <script type="text/javascript">
+        mui.init();
+        
+        var codeObj = document.getElementById("code");
+        var openidObj = document.getElementById("openid");
+        var mobileObj = document.getElementById("mobile");
+        
+        document.getElementById("bind").addEventListener("tap", function() {
+            if(!/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(mobileObj.value)){
+                plus.nativeUI.toast("手机号输入错误，请输入正确的手机号。");
+                return ;
+            }
+            
+            getDataByAjax({
+                type:"POST",
+                url:"bind?code="+codeObj.value,
+                data:JSON.stringify({"openid":openidObj.value,"mobile":mobileObj.value}),
+                contentType: 'application/json;', //指定'application/json;'，后台SpringMVC（使用了@RequestBody）才能接收 预期的字符串（openid）
+            }, function(result){
+                if(result.code == 0){
+                    //注册成功
+                    localStorage.setItem("loginInfo", result.data.uuid); //将信息保存至本地数据库
+                    localStorage.setItem("userName", result.data.name); //将信息保存至本地数据库
+                    plus.nativeUI.toast("注册成功" + localStorage.getItem("loginInfo"));
+                    //注册成功打开主页
+                    openPage("main.html");
+                    //关闭本页面
+                    plus.webview.currentWebview().close("none");
+                }
+            });
+        });
+        
+        var codeBtn = document.getElementById("getcode");
+        //获取验证码
+        codeBtn.addEventListener("tap", function() {
+            if(!/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(mobileObj.value)) {
+                plus.nativeUI.toast("手机号输入错误，请输入正确的手机号。");
+                return;
+            }
+            codeObj.placeholder = "请输入验证码";
+            countDown(codeBtn);//执行倒计时方法
+            codeBtn.setAttribute("disabled","disabled");
+            
+            getDataByAjax({
+                type: "POST",
+                url: 'send',
+                data: mobileObj.value,
+                contentType: 'application/json;',
+            }, function(result) {
+                console.info("获取验证码成功")
+            });
+        });
+        
+        mui.plusReady(function(){
+            var self = plus.webview.currentWebview();
+            var openid = self.openid;
+            
+            self.show();
+            //关闭父页面
+            var parentPage = plus.webview.getWebviewById(self.parentid);
+            parentPage&&parentPage.close("none");
+            
+            if(openid){
+                openidObj.name = "openid";//设置名字（则将该属性传至后台，name为空则不会）
+                openidObj.value = openid;
+            }
+        });
+    </script>
+</body>
+</html>

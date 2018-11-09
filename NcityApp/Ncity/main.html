@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Document</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link rel="stylesheet" type="text/css" href="css/mui.css" />
+        <style>
+            html,
+            body {
+                height: 100%
+            }
+			/*
+			  解决该错误（该错误提示不影响运行）：（解决后好像会有些其他问题，但目前没发现）
+			  Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/features/5093566007214080
+			*/
+			/* * { touch-action: pan-y; } */
+            
+            /*header {
+                position: absolute;
+                height: 44px;
+                right: 0;
+                left: 0;
+                line-height: 44px;
+                padding-left: 20px;
+                border-bottom: 1px solid #aaa;
+            }*/
+        </style>
+    </head>
+
+    <body>
+        <!--<header class="header">
+            <span class="mui-icon mui-icon-map"></span>
+            <span>芯城科技园</span>
+            <a style="font-size: 12px;color: #aaa;margin-left: 10px;">点击修改</a>
+        </header>-->
+
+        <nav class="mui-bar mui-bar-tab">
+            <a class="mui-tab-item mui-active" href="index.html" id="new">
+                <span class="mui-icon mui-icon-home"></span>
+                <span class="mui-tab-label">首页</span>
+            </a>
+            <a class="mui-tab-item" href="new.html" id="new">
+                <span class="mui-icon mui-icon-paperplane"></span>
+                <span class="mui-tab-label">发现</span>
+            </a>
+            <a class="mui-tab-item" href="my.html" id="my">
+                <span class="mui-icon mui-icon-person"></span>
+                <span class="mui-tab-label">我的</span>
+            </a>
+        </nav>
+
+        <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            mui.init();
+            var subpages = ['index.html', 'my.html', 'new.html']; //跳转的页面（用于判断用户点击）
+						// var subWebview = {};
+            var subpage_style = { //打开页面的样式（顶部与底部的距离，防止遮盖导航栏）
+                top: '0px',
+                bottom: '50px'
+            };
+            //当前激活选项卡（默认为第一个）
+            var activeTab = subpages[0];
+            mui(".mui-bar").on("tap", "a", function() {
+                //是否有小标（导航图标右上角数字（未读信息））
+                var badge = mui(this)[0].getElementsByClassName("mui-badge")[0];
+                badge ? badge.style.display = "none" : ""; //设置隐藏
+
+                var targetTab = this.getAttribute("href");
+                if(targetTab == activeTab) { //避免显示同样的选项卡
+                    return;
+                }
+                //显示隐藏的选项卡(通过id显示)
+                plus.webview.show(targetTab, "none", 200);
+                //隐藏当前选项卡
+                plus.webview.hide(activeTab);
+                //更改当前选项卡
+                activeTab = targetTab
+								// mui.fire(subWebview[targetTab],'customEvent');
+            });
+            
+            //创建子页面，首个选项卡页面显示，其它均隐藏；
+            mui.plusReady(function() {
+                var self = plus.webview.currentWebview();
+                for(var i = 0; i < subpages.length; i++) {
+                    var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
+					// subWebview[subpages[i]] = sub;//将子页面添加进subWebview对象中
+                    //只显示一个页面
+                    if(i > 0) {
+                        sub.hide();
+                    }
+                    self.append(sub);
+                }
+                //显示当前页面
+                self.show("pop-in", 300);
+            });
+            
+            
+            //连按两次退出键退出应用
+            var backButtonPress = 0;
+            mui.back = function(event) {
+                backButtonPress++;
+                if(backButtonPress > 1) {
+                    plus.runtime.quit();
+                } else {
+                    plus.nativeUI.toast('再按一次退出应用');
+                }
+                setTimeout(function() {
+                    backButtonPress = 0;
+                }, 1000);
+                return false;
+            };
+        </script>
+    </body>
+
+</html>
